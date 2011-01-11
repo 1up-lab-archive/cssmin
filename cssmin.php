@@ -16,7 +16,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		2.0.1.0065 (2011-01-11)
+ * @version		2.0.1.0066 (2011-01-11)
  */
 class CssMin
 	{
@@ -299,8 +299,8 @@ class CssMin
 		"margin-top-collapse"			=> array(null, "-webkit-margin-top-collapse", null, null),
 		"marquee "						=> array(null, "-webkit-marquee", null, null),
 		"marquee-direction"				=> array(null, "-webkit-marquee-direction", null, null),
-		"-webkit-marquee-increment"		=> array(null, "-webkit-marquee-increment", null, null),
-		"-webkit-marquee-repetition"	=> array(null, "-webkit-marquee-repetition", null, null),
+		"marquee-increment"				=> array(null, "-webkit-marquee-increment", null, null),
+		"marquee-repetition"			=> array(null, "-webkit-marquee-repetition", null, null),
 		"marquee-speed"					=> array(null, "-webkit-marquee-speed", null, null),
 		"marquee-style"					=> array(null, "-webkit-marquee-style", null, null),
 		"mask"							=> array(null, "-webkit-mask", null, null),
