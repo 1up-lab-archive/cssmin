@@ -16,7 +16,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		2.0.1.0066 (2011-01-11)
+ * @version		2.0.2.0068.beta1 (2011-01-21)
  */
 class CssMin
 	{
@@ -183,11 +183,164 @@ class CssMin
 	 */
 	const T_STRING_URL = 255;
 	/**
-	 * Css transformations table. Used to convert CSS3 and proprietary properties to the browser-specific counterparts.
+	 * Css color transformations table. Used to convert named colors to hexadecimal notation.
 	 * 
 	 * @var array
 	 */
-	private static $transformations = array
+	private static $colorTransformations = array
+		(
+		"aliceblue"						=> "#f0f8ff",
+		"antiquewhite"					=> "#faebd7",
+		"aqua"							=> "#0ff",
+		"aquamarine"					=> "#7fffd4",
+		"azure"							=> "#f0ffff",
+		"beige"							=> "#f5f5dc",
+		"black"							=> "#000",
+		"blue"							=> "#00f",
+		"blueviolet"					=> "#8a2be2",
+		"brown"							=> "#a52a2a",
+		"burlywood"						=> "#deb887",
+		"cadetblue"						=> "#5f9ea0",
+		"chartreuse"					=> "#7fff00",
+		"chocolate"						=> "#d2691e",
+		"coral"							=> "#ff7f50",
+		"cornflowerblue"				=> "#6495ed",
+		"cornsilk"						=> "#fff8dc",
+		"crimson"						=> "#dc143c",
+		"darkblue"						=> "#00008b",
+		"darkcyan"						=> "#008b8b",
+		"darkgoldenrod"					=> "#b8860b",
+		"darkgray"						=> "#a9a9a9",
+		"darkgreen"						=> "#006400",
+		"darkkhaki"						=> "#bdb76b",
+		"darkmagenta"					=> "#8b008b",
+		"darkolivegreen"				=> "#556b2f",
+		"darkorange"					=> "#ff8c00",
+		"darkorchid"					=> "#9932cc",
+		"darkred"						=> "#8b0000",
+		"darksalmon"					=> "#e9967a",
+		"darkseagreen"					=> "#8fbc8f",
+		"darkslateblue"					=> "#483d8b",
+		"darkslategray"					=> "#2f4f4f",
+		"darkturquoise"					=> "#00ced1",
+		"darkviolet"					=> "#9400d3",
+		"deeppink"						=> "#ff1493",
+		"deepskyblue"					=> "#00bfff",
+		"dimgray"						=> "#696969",
+		"dodgerblue"					=> "#1e90ff",
+		"firebrick"						=> "#b22222",
+		"floralwhite"					=> "#fffaf0",
+		"forestgreen"					=> "#228b22",
+		"fuchsia"						=> "#f0f",
+		"gainsboro"						=> "#dcdcdc",
+		"ghostwhite"					=> "#f8f8ff",
+		"gold"							=> "#ffd700",
+		"goldenrod"						=> "#daa520",
+		"gray"							=> "#808080",
+		"green"							=> "#008000",
+		"greenyellow"					=> "#adff2f",
+		"honeydew"						=> "#f0fff0",
+		"hotpink"						=> "#ff69b4",
+		"indianred"						=> "#cd5c5c",
+		"indigo"						=> "#4b0082",
+		"ivory"							=> "#fffff0",
+		"khaki"							=> "#f0e68c",
+		"lavender"						=> "#e6e6fa",
+		"lavenderblush"					=> "#fff0f5",
+		"lawngreen"						=> "#7cfc00",
+		"lemonchiffon"					=> "#fffacd",
+		"lightblue"						=> "#add8e6",
+		"lightcoral"					=> "#f08080",
+		"lightcyan"						=> "#e0ffff",
+		"lightgoldenrodyellow"			=> "#fafad2",
+		"lightgreen"					=> "#90ee90",
+		"lightgrey"						=> "#d3d3d3",
+		"lightpink"						=> "#ffb6c1",
+		"lightsalmon"					=> "#ffa07a",
+		"lightseagreen"					=> "#20b2aa",
+		"lightskyblue"					=> "#87cefa",
+		"lightslategray"				=> "#789",
+		"lightsteelblue"				=> "#b0c4de",
+		"lightyellow"					=> "#ffffe0",
+		"lime"							=> "#0f0",
+		"limegreen"						=> "#32cd32",
+		"linen"							=> "#faf0e6",
+		"maroon"						=> "#800000",
+		"mediumaquamarine"				=> "#66cdaa",
+		"mediumblue"					=> "#0000cd",
+		"mediumorchid"					=> "#ba55d3",
+		"mediumpurple"					=> "#9370db",
+		"mediumseagreen"				=> "#3cb371",
+		"mediumslateblue"				=> "#7b68ee",
+		"mediumspringgreen"				=> "#00fa9a",
+		"mediumturquoise"				=> "#48d1cc",
+		"mediumvioletred"				=> "#c71585",
+		"midnightblue"					=> "#191970",
+		"mintcream"						=> "#f5fffa",
+		"mistyrose"						=> "#ffe4e1",
+		"moccasin"						=> "#ffe4b5",
+		"navajowhite"					=> "#ffdead",
+		"navy"							=> "#000080",
+		"oldlace"						=> "#fdf5e6",
+		"olive"							=> "#808000",
+		"olivedrab"						=> "#6b8e23",
+		"orange"						=> "#ffa500",
+		"orangered"						=> "#ff4500",
+		"orchid"						=> "#da70d6",
+		"palegoldenrod"					=> "#eee8aa",
+		"palegreen"						=> "#98fb98",
+		"paleturquoise"					=> "#afeeee",
+		"palevioletred"					=> "#db7093",
+		"papayawhip"					=> "#ffefd5",
+		"peachpuff"						=> "#ffdab9",
+		"peru"							=> "#cd853f",
+		"pink"							=> "#ffc0cb",
+		"plum"							=> "#dda0dd",
+		"powderblue"					=> "#b0e0e6",
+		"purple"						=> "#800080",
+		"red"							=> "#f00",
+		"rosybrown"						=> "#bc8f8f",
+		"royalblue"						=> "#4169e1",
+		"saddlebrown"					=> "#8b4513",
+		"salmon"						=> "#fa8072",
+		"sandybrown"					=> "#f4a460",
+		"seagreen"						=> "#2e8b57",
+		"seashell"						=> "#fff5ee",
+		"sienna"						=> "#a0522d",
+		"silver"						=> "#c0c0c0",
+		"skyblue"						=> "#87ceeb",
+		"slateblue"						=> "#6a5acd",
+		"slategray"						=> "#708090",
+		"snow"							=> "#fffafa",
+		"springgreen"					=> "#00ff7f",
+		"steelblue"						=> "#4682b4",
+		"tan"							=> "#d2b48c",
+		"teal"							=> "#008080",
+		"thistle"						=> "#d8bfd8",
+		"tomato"						=> "#ff6347",
+		"turquoise"						=> "#40e0d0",
+		"violet"						=> "#ee82ee",
+		"wheat"							=> "#f5deb3",
+		"white"							=> "#fff",
+		"whitesmoke"					=> "#f5f5f5",
+		"yellow"						=> "#ff0",
+		"yellowgreen"					=> "#9acd32"
+		);
+	/**
+	 * 
+	 * @var array
+	 */
+	private static $fontWeightTransformations = array
+ 		(
+ 		"normal"						=> "400",
+ 		"bold"							=> "700"
+ 		);
+	/**
+	 * Css property transformations table. Used to convert CSS3 and proprietary properties to the browser-specific counterparts.
+	 * 
+	 * @var array
+	 */
+	private static $propertyTransformations = array
 		(
 		// Property						Array(Mozilla, Webkit, Opera, Internet Explorer); NULL values are placeholders and will get ignored
 		"animation"						=> array(null, "-webkit-animation", null, null),
@@ -398,11 +551,18 @@ class CssMin
 	 * Minifies the Css.
 	 * 
 	 * @param string $css Css as string
-	 * @param array $config {@link http://code.google.com/p/cssmin/wiki/Configuration Configuration [optional]}
+	 * @param array $config {@link http://code.google.com/p/cssmin/wiki/Configuration Configuration} as array [optional]
 	 * @return string Minified css
 	 */
 	public static function minify($css, $config = array())
 		{
+		$r = "";
+		foreach (self::$propertyTransformations as $i => $v)
+			{
+			$r .= " * " . $i . "\n";
+			}
+		dump($r);die;
+		
 		$tokens = self::parse($css);
 		$config = array_merge(array
 			(
@@ -410,21 +570,37 @@ class CssMin
 			"remove-empty-rulesets"			=> true,
 			"remove-last-semicolons"		=> true,
 			"convert-css3-properties"		=> false,
-			"convert-color-values"			=> false,
+			"convert-font-weight-values"	=> false,
+			"convert-named-color-values"	=> false,
+			"convert-rgb-color-values"		=> false,
 			"compress-color-values"			=> false,
 			"compress-unit-values"			=> false,
 			"emulate-css3-variables"		=> true
 			), $config);
-		// Minification options
- 		$sRemoveEmptyBlocks			= $config["remove-empty-blocks"]; 
- 		$sRemoveEmptyRulesets		= $config["remove-empty-rulesets"];
- 		$sRemoveLastSemicolon		= $config["remove-last-semicolons"];
- 		$sConvertCss3Properties 	= $config["convert-css3-properties"];
-		$sCompressUnitValues		= $config["compress-unit-values"];
-		$sConvertColorValues		= $config["convert-color-values"];
-		$sCompressColorValues		= $config["compress-color-values"];
-		$sEmulateCcss3Variables		= $config["emulate-css3-variables"];
-		$sRemoveTokens				= array(self::T_COMMENT);
+		
+		// Minification options/variables
+ 		$sRemoveEmptyBlocks				= $config["remove-empty-blocks"]; 
+ 		$sRemoveEmptyRulesets			= $config["remove-empty-rulesets"];
+ 		$sRemoveLastSemicolon			= $config["remove-last-semicolons"];
+ 		$sConvertCss3Properties 		= $config["convert-css3-properties"];
+ 		$sConvertFontWeightValues		= $config["convert-font-weight-values"];
+ 		$rConvertFontWeightValues		= "/(^|\s)+(normal|bold)(\s|$)+/ie";
+ 		$rConvertFontWeightValuesR		= "'\\1'.self::\$fontWeightTransformations['\\2'].'\\3'";
+ 		$sConvertNamedColorValues		= $config["convert-named-color-values"];
+ 		$rConvertNamedColorValues 		= "/(^|\s)+(" . implode("|", array_keys(self::$colorTransformations)) . ")(\s|$)+/ie";
+ 		$rConvertNamedColorValuesR 		= "'\\1'.self::\$colorTransformations['\\2'].'\\3'";
+ 		$sConvertRgbColorValues			= $config["convert-rgb-color-values"];
+ 		$rConvertRgbColorValues			= "/rgb\s*\(\s*([0-9%]+)\s*,\s*([0-9%]+)\s*,\s*([0-9%]+)\s*\)/iS";
+		$sCompressColorValues			= $config["compress-color-values"];
+		$rCompressColorValues			= "/\#([0-9a-f]{6})/iS";
+		$sCompressUnitValues			= $config["compress-unit-values"];
+		$rCompressUnitValues1			= "/(^| |-)0\.([0-9]+?)(0+)?(%|em|ex|px|in|cm|mm|pt|pc)/iS";
+		$rCompressUnitValues1R			= "\${1}.\${2}\${4}";
+		$rCompressUnitValues2			= "/(^| )-?(\.?)0(%|em|ex|px|in|cm|mm|pt|pc)/iS";
+		$rCompressUnitValues2R			= "\${1}0";
+		$sEmulateCcss3Variables			= $config["emulate-css3-variables"];
+		$sRemoveTokens					= array(self::T_COMMENT);
+		
 		/*
 		 * Remove tokens
 		 */
@@ -530,18 +706,23 @@ class CssMin
 							}
 						}
 					}
+				// Convert font-weight values ("normal" to "400"; "bold" to "700" 
+				if ($sConvertFontWeightValues && in_array(strtolower($tokens[$i][1]), array("font-weight", "font")) && preg_match($rConvertFontWeightValues, $tokens[$i][2]))
+					{
+					$tokens[$i][2] = preg_replace($rConvertFontWeightValues, $rConvertFontWeightValuesR, $tokens[$i][2]);
+					}
 				// Compress unit values
 				if ($sCompressUnitValues)
 					{
 					// Compress "0.5px" to ".5px"
-					$tokens[$i][2] = preg_replace("/(^| |-)0\.([0-9]+)(%|em|ex|px|in|cm|mm|pt|pc)/iS", "\${1}.\${2}\${3}", $tokens[$i][2]);
+					$tokens[$i][2] = preg_replace($rCompressUnitValues1, $rCompressUnitValues1R, $tokens[$i][2]);
 					// Compress "0px" to "0"
-					$tokens[$i][2] = preg_replace("/(^| )-?(\.?)0(%|em|ex|px|in|cm|mm|pt|pc)/iS", "\${1}0", $tokens[$i][2]);
-					// Compress "0 0 0 0" to "0"
-					if ($tokens[$i][2] == "0 0 0 0") {$tokens[$i][2] = "0";}
+					$tokens[$i][2] = preg_replace($rCompressUnitValues2, $rCompressUnitValues2R, $tokens[$i][2]);
+					// Compress "0 0 0 0", "0 0 0" and "0 0" to "0"
+					if ($tokens[$i][2] == "0 0 0 0" || $tokens[$i][2] == "0 0 0" || $tokens[$i][2] == "0 0") {$tokens[$i][2] = "0";}
 					}
 				// Convert RGB color values to hex ("rgb(200,60%,5)" => "#c89905")
-				if ($sConvertColorValues && preg_match("/rgb\s*\(\s*([0-9%]+)\s*,\s*([0-9%]+)\s*,\s*([0-9%]+)\s*\)/iS", $tokens[$i][2], $m))
+				if ($sConvertRgbColorValues && preg_match($rConvertRgbColorValues, $tokens[$i][2], $m))
 					{
 					for ($i2 = 1, $l2 = count($m); $i2 < $l2; $i2++)
 						{
@@ -555,7 +736,7 @@ class CssMin
 					$tokens[$i][2] = str_replace($m[0], "#" . $m[1] . $m[2] . $m[3], $tokens[$i][2]);
 					}
 				// Compress color values ("#aabbcc" to "#abc") 
-				if ($sCompressColorValues && preg_match("/\#([0-9a-f]{6})/iS", $tokens[$i][2], $m))
+				if ($sCompressColorValues && preg_match($rCompressColorValues, $tokens[$i][2], $m))
 					{
 					$m[1] = strtolower($m[1]);
 					if (substr($m[1], 0, 1) == substr($m[1], 1, 1) && substr($m[1], 2, 1) == substr($m[1], 3, 1) && substr($m[1], 4, 1) == substr($m[1], 5, 1))
@@ -563,7 +744,13 @@ class CssMin
 						$tokens[$i][2] = str_replace($m[0], "#" . substr($m[1], 0, 1) . substr($m[1], 2, 1) . substr($m[1], 4, 1), $tokens[$i][2]);
 						}
 					}
+				// Convert named color values ("black" to "#000" or "gray" to "#808080")
+				if ($sConvertNamedColorValues && preg_match($rConvertNamedColorValues, $tokens[$i][2]))
+					{
+					$tokens[$i][2] = preg_replace($rConvertNamedColorValues, $rConvertNamedColorValuesR, $tokens[$i][2]);
+					}
 				}
+			
 			}
 		/*
 		 * Create minified css
@@ -622,9 +809,9 @@ class CssMin
 			elseif ($tokens[$i][0] == self::T_DECLARATION)
 				{
 				// Convert CSS3 properties if 'convert-css3-properties' is enabled
-				if ($sConvertCss3Properties && isset(self::$transformations[$tokens[$i][1]]))
+				if ($sConvertCss3Properties && isset(self::$propertyTransformations[$tokens[$i][1]]))
 					{
-					foreach (self::$transformations[$tokens[$i][1]] as $value)
+					foreach (self::$propertyTransformations[$tokens[$i][1]] as $value)
 						{
 						if (!is_null($value) && !is_array($value))
 							{
@@ -670,6 +857,7 @@ class CssMin
 		$c					= null;								// Current char
 		$p					= null;								// Previous char
 		$buffer 			= "";								// Buffer
+		$saveBuffer			= "";								// Saved buffer
 		$state				= array(self::T_DOCUMENT);			// State stack
 		$currentState		= self::T_DOCUMENT;					// Current state
 		$scope				= $sDefaultScope;					// Current scope
@@ -712,7 +900,7 @@ class CssMin
 					{
 					// Save the buffer (will get restored with comment ending)
 					$saveBuffer = substr($buffer, 0, -2);
-					$buffer 	= $c;
+					$buffer 	= $p . $c;
 					$isFilterWs	= false;
 					array_push($state, self::T_COMMENT);
 					}
