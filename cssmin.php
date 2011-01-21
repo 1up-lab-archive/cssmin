@@ -556,13 +556,6 @@ class CssMin
 	 */
 	public static function minify($css, $config = array())
 		{
-		$r = "";
-		foreach (self::$propertyTransformations as $i => $v)
-			{
-			$r .= " * " . $i . "\n";
-			}
-		dump($r);die;
-		
 		$tokens = self::parse($css);
 		$config = array_merge(array
 			(
