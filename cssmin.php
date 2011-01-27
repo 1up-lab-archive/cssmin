@@ -16,7 +16,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		2.0.2.0068.beta1 (2011-01-21)
+ * @version		2.0.2.0079.beta2 (2011-01-27)
  */
 class CssMin
 	{
@@ -182,6 +182,25 @@ class CssMin
 	 * @var integer
 	 */
 	const T_STRING_URL = 255;
+	/**
+	 * Default configuration.
+	 * 
+	 * @var array
+	 */
+	private static $defaultConfiguration = array
+		(
+		"remove-empty-blocks"			=> true,
+		"remove-empty-rulesets"			=> true,
+		"remove-last-semicolons"		=> true,
+		"convert-css3-properties"		=> false,
+		"convert-font-weight-values"	=> false,
+		"convert-named-color-values"	=> false,
+		"convert-hsl-color-values"		=> false,
+		"convert-rgb-color-values"		=> false,
+		"compress-color-values"			=> false,
+		"compress-unit-values"			=> false,
+		"emulate-css3-variables"		=> true
+		);
 	/**
 	 * Css color transformations table. Used to convert named colors to hexadecimal notation.
 	 * 
@@ -557,20 +576,7 @@ class CssMin
 	public static function minify($css, $config = array())
 		{
 		$tokens = self::parse($css);
-		$config = array_merge(array
-			(
-			"remove-empty-blocks"			=> true,
-			"remove-empty-rulesets"			=> true,
-			"remove-last-semicolons"		=> true,
-			"convert-css3-properties"		=> false,
-			"convert-font-weight-values"	=> false,
-			"convert-named-color-values"	=> false,
-			"convert-rgb-color-values"		=> false,
-			"compress-color-values"			=> false,
-			"compress-unit-values"			=> false,
-			"emulate-css3-variables"		=> true
-			), $config);
-		
+		$config = array_merge(self::$defaultConfiguration, $config);
 		// Minification options/variables
  		$sRemoveEmptyBlocks				= $config["remove-empty-blocks"]; 
  		$sRemoveEmptyRulesets			= $config["remove-empty-rulesets"];
@@ -584,6 +590,8 @@ class CssMin
  		$rConvertNamedColorValuesR 		= "'\\1'.self::\$colorTransformations['\\2'].'\\3'";
  		$sConvertRgbColorValues			= $config["convert-rgb-color-values"];
  		$rConvertRgbColorValues			= "/rgb\s*\(\s*([0-9%]+)\s*,\s*([0-9%]+)\s*,\s*([0-9%]+)\s*\)/iS";
+ 		$sConvertHslColorValues			= $config["convert-rgb-color-values"];
+ 		$rConvertHslColorValues			= "/^hsl\s*\(\s*([0-9]+)\s*,\s*([0-9]+)\s*%\s*,\s*([0-9]+)\s*%\s*\)/iS";
 		$sCompressColorValues			= $config["compress-color-values"];
 		$rCompressColorValues			= "/\#([0-9a-f]{6})/iS";
 		$sCompressUnitValues			= $config["compress-unit-values"];
@@ -593,7 +601,6 @@ class CssMin
 		$rCompressUnitValues2R			= "\${1}0";
 		$sEmulateCcss3Variables			= $config["emulate-css3-variables"];
 		$sRemoveTokens					= array(self::T_COMMENT);
-		
 		/*
 		 * Remove tokens
 		 */
@@ -727,6 +734,11 @@ class CssMin
 						$m[$i2] = str_pad(dechex($m[$i2]),  2, "0", STR_PAD_LEFT);
 						}
 					$tokens[$i][2] = str_replace($m[0], "#" . $m[1] . $m[2] . $m[3], $tokens[$i][2]);
+					}
+				// Convert HSL color values to hex ("hsl(232,36%,48%);" => "#4e5aa7")
+				if ($sConvertHslColorValues && preg_match($rConvertHslColorValues, $tokens[$i][2], $m))
+					{
+					$tokens[$i][2] = str_replace($m[0], self::_hsl2hex($m[1], $m[2], $m[3]), $tokens[$i][2]);
 					}
 				// Compress color values ("#aabbcc" to "#abc") 
 				if ($sCompressColorValues && preg_match($rCompressColorValues, $tokens[$i][2], $m))
@@ -1263,6 +1275,74 @@ class CssMin
 			{
 			return "";
 			}
+		}
+	/**
+	 * Convert a HSL value to hexadecimal notation. 
+	 * 
+	 * @param integer $hue Hue
+	 * @param integer $saturation Saturation
+	 * @param integer $lightness Lightnesss
+	 * @return string
+	 */
+	private static function _hsl2hex($hue, $saturation, $lightness)
+		{
+		$hue		= $hue / 360;
+		$saturation	= $saturation / 100;
+		$lightness	= $lightness / 100;
+		if ($saturation == 0)
+			{
+			$red	= $lightness * 255;
+			$green	= $lightness * 255;
+			$blue	= $lightness * 255;
+			}
+		else
+			{
+			if ($lightness < 0.5 )
+				{
+				$v2 = $lightness * (1 + $saturation);
+				}
+			else
+				{
+				$v2 = ($lightness + $saturation) - ($saturation * $lightness);
+				}
+			$v1		= 2 * $lightness - $v2;
+			$red	= 255 * self::_hue2rgb($v1, $v2, $hue + (1 / 3));
+			$green	= 255 * self::_hue2rgb($v1, $v2, $hue);
+			$blue	= 255 * self::_hue2rgb($v1, $v2, $hue - (1 / 3));
+			}
+		return "#" . str_pad(dechex(round($red)), 2, "0", STR_PAD_LEFT) . str_pad(dechex(round($green)), 2, "0", STR_PAD_LEFT) . str_pad(dechex(round($blue)), 2, "0", STR_PAD_LEFT);
+		}
+	/**
+	 * Apply hue to a rgb color value.
+	 * 
+	 * @param integer $v1 Value 1
+	 * @param integer $v2 Value 2
+	 * @param integer $hue Hue
+	 * @return integer
+	 */
+	private static function _hue2rgb($v1, $v2, $hue)
+		{
+		if ($hue < 0)
+			{
+			$hue += 1;
+			}
+		if ($hue > 1)
+			{
+			$hue -= 1;
+			}
+		if ((6 * $hue) < 1)
+			{
+			return ($v1 + ($v2 - $v1) * 6 * $hue);
+			}
+		if ((2 * $hue) < 1)
+			{
+			return ($v2);
+			}
+		if ((3 * $hue) < 2)
+			{
+			return ($v1 + ($v2 - $v1) * (( 2 / 3) - $hue) * 6);
+			}
+		return $v1;
 		}
 	}
 ?>
