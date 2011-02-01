@@ -16,10 +16,16 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		2.0.2.0079.beta2 (2011-01-27)
+ * @version		2.0.2.0083.beta3 (2011-02-01)
  */
 class CssMin
 	{
+	/**
+	 * Null-Token.
+	 * 
+	 * @var integer
+	 */
+	const T_NULL = 0;
 	/**
 	 * State: Is in document
 	 * 
@@ -38,6 +44,12 @@ class CssMin
 	 * @var integer
 	 */
 	const T_AT_RULE = 3;
+	/**
+	 * Token: Generic at-rule
+	 * 
+	 * @var integer
+	 */
+	const T_AT_IMPORT = 22;
 	/**
 	 * Token: Start of @media block
 	 * 
@@ -199,7 +211,10 @@ class CssMin
 		"convert-rgb-color-values"		=> false,
 		"compress-color-values"			=> false,
 		"compress-unit-values"			=> false,
-		"emulate-css3-variables"		=> true
+		"emulate-css3-variables"		=> true,
+		"import-imports"				=> false,
+		"import-base-path"				=> null,
+		"import-remove-invalid"			=> false
 		);
 	/**
 	 * Css color transformations table. Used to convert named colors to hexadecimal notation.
@@ -576,22 +591,25 @@ class CssMin
 	public static function minify($css, $config = array())
 		{
 		$tokens = self::parse($css);
+		// Normalize configuration parameters
+		$config = array_combine(array_map("trim", array_map("strtolower", array_keys($config))), array_values($config));
 		$config = array_merge(self::$defaultConfiguration, $config);
 		// Minification options/variables
- 		$sRemoveEmptyBlocks				= $config["remove-empty-blocks"]; 
- 		$sRemoveEmptyRulesets			= $config["remove-empty-rulesets"];
- 		$sRemoveLastSemicolon			= $config["remove-last-semicolons"];
- 		$sConvertCss3Properties 		= $config["convert-css3-properties"];
- 		$sConvertFontWeightValues		= $config["convert-font-weight-values"];
- 		$rConvertFontWeightValues		= "/(^|\s)+(normal|bold)(\s|$)+/ie";
- 		$rConvertFontWeightValuesR		= "'\\1'.self::\$fontWeightTransformations['\\2'].'\\3'";
- 		$sConvertNamedColorValues		= $config["convert-named-color-values"];
- 		$rConvertNamedColorValues 		= "/(^|\s)+(" . implode("|", array_keys(self::$colorTransformations)) . ")(\s|$)+/ie";
- 		$rConvertNamedColorValuesR 		= "'\\1'.self::\$colorTransformations['\\2'].'\\3'";
- 		$sConvertRgbColorValues			= $config["convert-rgb-color-values"];
- 		$rConvertRgbColorValues			= "/rgb\s*\(\s*([0-9%]+)\s*,\s*([0-9%]+)\s*,\s*([0-9%]+)\s*\)/iS";
- 		$sConvertHslColorValues			= $config["convert-rgb-color-values"];
- 		$rConvertHslColorValues			= "/^hsl\s*\(\s*([0-9]+)\s*,\s*([0-9]+)\s*%\s*,\s*([0-9]+)\s*%\s*\)/iS";
+		$sRemoveEmptyBlocks				= $config["remove-empty-blocks"];
+		$sRemoveEmptyRulesets			= $config["remove-empty-rulesets"];
+		$sRemoveLastSemicolon			= $config["remove-last-semicolons"];
+		$sConvertCss3Properties 		= $config["convert-css3-properties"];
+		$sCss3Variables					= array();
+		$sConvertFontWeightValues		= $config["convert-font-weight-values"];
+		$rConvertFontWeightValues		= "/(^|\s)+(normal|bold)(\s|$)+/ie";
+		$rConvertFontWeightValuesR		= "'\\1'.self::\$fontWeightTransformations['\\2'].'\\3'";
+		$sConvertNamedColorValues		= $config["convert-named-color-values"];
+		$rConvertNamedColorValues 		= "/(^|\s)+(" . implode("|", array_keys(self::$colorTransformations)) . ")(\s|$)+/ie";
+		$rConvertNamedColorValuesR 		= "'\\1'.self::\$colorTransformations['\\2'].'\\3'";
+		$sConvertRgbColorValues			= $config["convert-rgb-color-values"];
+		$rConvertRgbColorValues			= "/rgb\s*\(\s*([0-9%]+)\s*,\s*([0-9%]+)\s*,\s*([0-9%]+)\s*\)/iS";
+		$sConvertHslColorValues			= $config["convert-rgb-color-values"];
+		$rConvertHslColorValues			= "/^hsl\s*\(\s*([0-9]+)\s*,\s*([0-9]+)\s*%\s*,\s*([0-9]+)\s*%\s*\)/iS";
 		$sCompressColorValues			= $config["compress-color-values"];
 		$rCompressColorValues			= "/\#([0-9a-f]{6})/iS";
 		$sCompressUnitValues			= $config["compress-unit-values"];
@@ -600,14 +618,214 @@ class CssMin
 		$rCompressUnitValues2			= "/(^| )-?(\.?)0(%|em|ex|px|in|cm|mm|pt|pc)/iS";
 		$rCompressUnitValues2R			= "\${1}0";
 		$sEmulateCcss3Variables			= $config["emulate-css3-variables"];
-		$sRemoveTokens					= array(self::T_COMMENT);
+		$sImportImports					= $config["import-imports"];
+		$sImportBasePath				= $config["import-base-path"];
+		$sImportRemoveInvalid			= $config["import-remove-invalid"];
+		$sImportStartBlockTokens		= array(self::T_AT_MEDIA_START, self::T_AT_FONT_FACE_START, self::T_AT_PAGE_START);
+		$sImportEndBlockTokens 			= array(self::T_AT_MEDIA_END, self::T_AT_FONT_FACE_END, self::T_AT_PAGE_END);
+		$sImportStatementTokens 		= array(self::T_AT_RULE, self::T_AT_IMPORT);
+		$sImportMediaEndToken			= array(self::T_AT_MEDIA_END);
+		$sImportImportedFiles			= array();
+		$sRemoveTokens					= array(self::T_NULL, self::T_COMMENT);
+		
 		/*
-		 * Remove tokens
+		 * Import @import at-rules.
+		 * 
+		 * If the @import at-rule defines one or more media type the imported tokens wil get wrapped into T_AT_MEDIA_START 
+		 * and T_AT_MEDIA_END token. @font-face, @media and @page at-rule blocks and at-rule statements will get excluded
+		 * of the wraping.
+		 * 
+		 * Additional @media at-rule blocks with media types not defined in the @import at-rule have to get removed.
+		 * Browsers ignore @media at-rule block with media types incompatible to the media types defined in the @import
+		 * at-rule.
+		 * 
+		 * Also @import rules require special treatment. If a included @import at-rule has no media type or only the 
+		 * "all" media type defined the media type of the @import at-rule will get set to the ones defined in the parent
+		 * @import at-rule. Media types not defined in the parent @import at-rule will get filtered. @import at-rule
+		 * with not matching media types will get removed.
+		 * 
+		 * For compression if a @media at-rule block is defined the same media type as the @import at-rule the 
+		 * T_AT_MEDIA_START and T_AT_MEDIA_END tokens will get removed.
 		 */
-		// Add variables tokens to the list of token to remove if 'emulate-css3-variables' is disabled
+		if ($sImportImports && is_dir($sImportBasePath))
+			{
+			$importFile				= "";
+			$importTokens			= array();
+			$importMediaStartToken	= array(self::T_NULL);
+			$importBlocks			= array();
+			for($i = 0, $l = count($tokens); $i < $l; $i++)
+				{
+				if ($tokens[$i][0] == self::T_AT_IMPORT && file_exists($sImportBasePath . $tokens[$i][1]))
+					{
+					$importFile = $sImportBasePath . $tokens[$i][1];
+					// Import file already imported; remove this @import at-rule to prevent any recursion
+					if (in_array($importFile, $sImportImportedFiles))
+						{
+						$tokens[$i] = array(self::T_NULL);
+						}
+					else
+						{
+						$sImportImportedFiles[]	= $sImportBasePath . $tokens[$i][1];
+						$importTokens			= self::parse(file_get_contents($importFile));
+						// The @import at-rule has media types defined requires special handling
+						if (count($tokens[$i][2]) > 0 && !(count($tokens[$i][2]) == 1 && $tokens[$i][2][0] == "all"))
+							{
+							// Create T_AT_MEDIA_START token used for wrapping and array for blocks
+							$importMediaStartToken	= array(self::T_AT_MEDIA_START, $tokens[$i][2]);
+							$importBlocks			= array();
+							// Filter or set media types of @import at-rule or remove the @import at-rule if no media type is matching the parent @import at-rule
+							for($ii = 0, $ll = count($importTokens); $ii < $ll; $ii++)
+								{
+								if ($importTokens[$ii][0] == self::T_AT_IMPORT)
+									{
+									// @import at-rule defines no media type or only the "all" media type; set the media types to the one defined in the parent @import at-rule
+									if (count($importTokens[$ii][2]) == 0 || (count($importTokens[$ii][2]) == 1 && $importTokens[$ii][2][0]) == "all")
+										{
+										$importTokens[$ii][2] = $tokens[$i][2];
+										}
+									// @import at-rule defineds one or more media types; filter out media types not matching with the  parent @import at-rule
+									elseif (count($importTokens[$ii][2] > 0))
+										{
+										foreach ($importTokens[$ii][2] as $index => $mediaType)
+											{
+											if (!in_array($mediaType, $tokens[$i][2]))
+												{
+												unset($importTokens[$ii][2][$index]);
+												}
+											}
+										$importTokens[$ii][2] = array_values($importTokens[$ii][2]);
+										// If there are no media types left in the @import at-rule remove the @import at-rule
+										if (count($importTokens[$ii][2]) == 0)
+											{
+											$importTokens[$ii] = array(self::T_NULL);
+											}
+										}
+									}
+								}
+							// Remove media types of @media at-rule block not defined in the @import at-rule
+							for($ii = 0, $ll = count($importTokens); $ii < $ll; $ii++)
+								{
+								if ($importTokens[$ii][0] == self::T_AT_MEDIA_START)
+									{
+									foreach ($importTokens[$ii][1] as $index => $mediaType)
+										{
+										if (!in_array($mediaType, $tokens[$i][2]))
+											{
+											unset($importTokens[$ii][1][$index]);
+											}
+										$importTokens[$ii][1] = array_values($importTokens[$ii][1]);
+										}
+									}
+								}
+							// If no media types left of the @media at-rule block remove the complete block
+							for($ii = 0, $ll = count($importTokens); $ii < $ll; $ii++)
+								{
+								if ($importTokens[$ii][0] == self::T_AT_MEDIA_START)
+									{
+									if (count($importTokens[$ii][1]) == 0)
+										{
+										for ($iii = $ii; $iii < $ll; $iii++)
+											{
+											if ($importTokens[$iii][0] == self::T_AT_MEDIA_END)
+												{
+												break;
+												}
+											}
+										if ($importTokens[$iii][0] == self::T_AT_MEDIA_END)
+											{
+											array_splice($importTokens, $ii, $iii - $ii + 1, array());
+											$ll = count($importTokens);
+											}
+										}
+									}
+								}
+							// If the media types of the @media at-rule equals the media types defined in the @import at-rule remove the T_AT_MEDIA_START and T_AT_MEDIA_END token
+							for($ii = 0, $ll = count($importTokens); $ii < $ll; $ii++)
+								{
+								if ($importTokens[$ii][0] == self::T_AT_MEDIA_START && count(array_diff($tokens[$i][2], $importTokens[$ii][1])) == 0)
+									{
+									for ($iii = $ii; $iii < $ll; $iii++)
+										{
+										if ($importTokens[$iii][0] == self::T_AT_MEDIA_END)
+											{
+											break;
+											}
+										}
+									if ($importTokens[$iii][0] == self::T_AT_MEDIA_END)
+										{
+										unset($importTokens[$ii]);
+										unset($importTokens[$iii]);
+										$importTokens = array_values($importTokens);
+										$ll = count($importTokens);
+										}
+									}
+								}
+							// Extract @import at-rule tokens
+							for($ii = 0, $ll = count($importTokens); $ii < $ll; $ii++)
+								{
+								if ($importTokens[$ii][0] == self::T_AT_IMPORT)
+									{
+									$importBlocks = array_merge($importBlocks, array_splice($importTokens, $ii, 1, array()));
+									$ll = count($importTokens);
+									}
+								}
+							// Extract T_AT_RULE tokens
+							for($ii = 0, $ll = count($importTokens); $ii < $ll; $ii++)
+								{
+								if ($importTokens[$ii][0] == self::T_AT_RULE)
+									{
+									$importBlocks = array_merge($importBlocks, array_splice($importTokens, $ii, 1, array()));
+									$ll = count($importTokens);
+									}
+								}
+							// Extract the @font-face, @media and @page at-rule block
+							for($ii = 0, $ll = count($importTokens); $ii < $ll; $ii++)
+								{
+								if (in_array($importTokens[$ii][0], $sImportStartBlockTokens))
+									{
+									for ($iii = $ii; $iii < $ll; $iii++)
+										{
+										if (in_array($importTokens[$iii][0], $sImportEndBlockTokens))
+											{
+											break;
+											}
+										}
+									if (isset($importTokens[$iii][0]) && in_array($importTokens[$iii][0], $sImportEndBlockTokens))
+										{
+										$importBlocks = array_merge($importBlocks, array_splice($importTokens, $ii, $iii - $ii + 1, array()));
+										$ll = count($importTokens);
+										}
+									}
+								}
+							// Create the array with imported tokens for @import at-rules with defined media types
+							$importTokens = array_merge($importBlocks, array($importMediaStartToken), $importTokens, array($sImportMediaEndToken));
+							}
+						array_splice($tokens, $i, 1, $importTokens);
+						// Modify parameters of the for-loop
+						$i--;
+						$l = count($tokens);
+						}
+					}
+				}
+			}
+		/*
+		 * Remove tokens.
+		 * 
+		 * Remove tokens not required for minification. Defaults to T_NULL and T_COMMENT tokens.
+		 * 
+		 * If CSS Level 3 Variables (emulate-css3-variables) is disabled add T_AT_VARIABLES_START, T_VARIABLE_DECLARATION 
+		 * and T_AT_VARIABLES_END tokens.
+		 * 
+		 * If the configuration options "import-imports" and "import-remove-invalid" is enabled remove also remaining 
+		 * T_AT_IMPORT tokens.
+		 */
 		if (!$sEmulateCcss3Variables)
 			{
 			$sRemoveTokens = array_merge($sRemoveTokens, array(self::T_AT_VARIABLES_START, self::T_VARIABLE_DECLARATION, self::T_AT_VARIABLES_END));
+			}
+		if ($sImportImports && is_dir($sImportBasePath) && $sImportRemoveInvalid)
+			{
+			$sRemoveTokens[] = self::T_AT_IMPORT;
 			}
 		for($i = 0, $l = count($tokens); $i < $l; $i++)
 			{
@@ -619,12 +837,14 @@ class CssMin
 		$tokens = array_values($tokens);
 		/*
 		 * Remove empty rulesets
+		 * 
+		 * The ruleset is empty if it only contains the tokens T_RULESET_START, T_SELECTORS, T_DECLARATIONS_START, 
+		 * T_DECLARATIONS_END and T_RULESET_END
 		 */
 		if ($sRemoveEmptyRulesets)
 			{
 			for($i = 0, $l = count($tokens); $i < $l; $i++)
 				{
-				// The ruleset is empty if it only contains the tokens T_RULESET_START, T_SELECTORS, T_DECLARATIONS_START, T_DECLARATIONS_END and T_RULESET_END
 				if ($tokens[$i][0] == self::T_RULESET_START && $tokens[$i+4][0] == self::T_RULESET_END)
 					{
 					unset($tokens[$i]); 	// T_RULESET_START
@@ -654,12 +874,10 @@ class CssMin
 			$tokens = array_values($tokens);
 			}
 		/*
-		 * CSS Level 3 variables: parse variables
+		 * Parse CSS Level 3 variables if the configuration option "emulate-css3-variables" is enabled. 
 		 */
 		if ($sEmulateCcss3Variables)
 			{
-			// Parse variables
-			$variables = array();
 			for($i = 0, $l = count($tokens); $i < $l; $i++)
 				{
 				// Found a variable declaration
@@ -668,12 +886,12 @@ class CssMin
 					for($i2 = 0, $l2 = count($tokens[$i][3]); $i2 < $l2; $i2++)
 						{
 						// Create the scope (all, screen, print, etc.) if not defined
-						if (!isset($variables[$tokens[$i][3][$i2]]))
+						if (!isset($sCss3Variables[$tokens[$i][3][$i2]]))
 							{
-							$variables[$tokens[$i][3][$i2]] = array();
+							$sCss3Variables[$tokens[$i][3][$i2]] = array();
 							}
 						// Store variable and value
-						$variables[$tokens[$i][3][$i2]][$tokens[$i][1]] = $tokens[$i][2];
+						$sCss3Variables[$tokens[$i][3][$i2]][$tokens[$i][1]] = $tokens[$i][2];
 						}
 					}
 				}
@@ -685,43 +903,63 @@ class CssMin
 			{
 			if ($tokens[$i][0] == self::T_DECLARATION)
 				{
-				// CSS Level 3 variables
+				/*
+				 * Search for CSS Level 3 variable statement if the configuration option "emulate-css3-variables" is
+				 * enabled. 
+				 * 
+				 * The variable value depends on the media type of the declaration. Primary the variable value
+				 * of the media type of the declaration will get used if available. If no variable value for the media 
+				 * type of the declaration is defined use the variable value definition for the media type "all". 
+				 */
 				if ($sEmulateCcss3Variables)
 					{
 					// Found a 'var' statement
-					if (substr($tokens[$i][2], 0, 4) == "var(" && substr($tokens[$i][2], -1, 1) == ")")
+					if (strtolower(substr($tokens[$i][2], 0, 4)) == "var(" && substr($tokens[$i][2], -1, 1) == ")")
 						{
 						// Extract the variable name
 						$variable = trim(substr($tokens[$i][2], 4, -1));
-						// Append the scope 'all' to the token
+						// Append the media type "all" to the declaration
 						$tokens[$i][3][] = "all"; 
 						for($i2 = 0, $l2 = count($tokens[$i][3]); $i2 < $l2; $i2++)
 							{
-							// Found a variable value for the current scope
-							if (isset($variables[$tokens[$i][3][$i2]][$variable]))
+							// Found a variable value for the current media type scope
+							if (isset($sCss3Variables[$tokens[$i][3][$i2]][$variable]))
 								{
-								$tokens[$i][2] = $variables[$tokens[$i][3][$i2]][$variable];
+								$tokens[$i][2] = $sCss3Variables[$tokens[$i][3][$i2]][$variable];
 								break;
 								}
 							}
 						}
 					}
-				// Convert font-weight values ("normal" to "400"; "bold" to "700" 
+				/* 
+				 * Convert font-weight values if the configuration option "convert-font-weight-values" is enabled.
+				 *  
+				 * Will convert font weight values "normal" to "400" and "bold" to "700". Restricted to "font-weight"
+				 * and "font" declarations.
+				 */
 				if ($sConvertFontWeightValues && in_array(strtolower($tokens[$i][1]), array("font-weight", "font")) && preg_match($rConvertFontWeightValues, $tokens[$i][2]))
 					{
 					$tokens[$i][2] = preg_replace($rConvertFontWeightValues, $rConvertFontWeightValuesR, $tokens[$i][2]);
 					}
-				// Compress unit values
+				/**
+				 * Compress unit values if the configuration option "compress-unit-values" is enabled.
+				 * 
+				 * This will compress:
+				 * 	1. "0.5px" to ".5px"
+				 * 	2. "0px" to "0"
+				 * 	3. "0 0 0 0", "0 0 0" or "0 0" to "0"
+				 */
 				if ($sCompressUnitValues)
 					{
-					// Compress "0.5px" to ".5px"
 					$tokens[$i][2] = preg_replace($rCompressUnitValues1, $rCompressUnitValues1R, $tokens[$i][2]);
-					// Compress "0px" to "0"
 					$tokens[$i][2] = preg_replace($rCompressUnitValues2, $rCompressUnitValues2R, $tokens[$i][2]);
-					// Compress "0 0 0 0", "0 0 0" and "0 0" to "0"
 					if ($tokens[$i][2] == "0 0 0 0" || $tokens[$i][2] == "0 0 0" || $tokens[$i][2] == "0 0") {$tokens[$i][2] = "0";}
 					}
-				// Convert RGB color values to hex ("rgb(200,60%,5)" => "#c89905")
+				/*
+				 * Convert RGB color values if the configuration option "convert-rgb-color-values" is enabled.
+				 * 
+				 * This will convert values like "rgb(200,60%,5)" to "#c89905".
+				 */
 				if ($sConvertRgbColorValues && preg_match($rConvertRgbColorValues, $tokens[$i][2], $m))
 					{
 					for ($i2 = 1, $l2 = count($m); $i2 < $l2; $i2++)
@@ -735,12 +973,20 @@ class CssMin
 						}
 					$tokens[$i][2] = str_replace($m[0], "#" . $m[1] . $m[2] . $m[3], $tokens[$i][2]);
 					}
-				// Convert HSL color values to hex ("hsl(232,36%,48%);" => "#4e5aa7")
+				/**
+				 * Convert HSL color values if the configuration option "convert-hsl-color-values" is enabled.
+				 * 
+				 * This will convert values like "hsl(232,36%,48%)" to "#4e5aa7".
+				 */
 				if ($sConvertHslColorValues && preg_match($rConvertHslColorValues, $tokens[$i][2], $m))
 					{
 					$tokens[$i][2] = str_replace($m[0], self::_hsl2hex($m[1], $m[2], $m[3]), $tokens[$i][2]);
 					}
-				// Compress color values ("#aabbcc" to "#abc") 
+				/**
+				 * Compress color values if the configuration option "compress-color-values" is enabled.
+				 * 
+				 * This will convert color value like "#aabbcc" to their short notation "#abc". 
+				 */
 				if ($sCompressColorValues && preg_match($rCompressColorValues, $tokens[$i][2], $m))
 					{
 					$m[1] = strtolower($m[1]);
@@ -749,13 +995,16 @@ class CssMin
 						$tokens[$i][2] = str_replace($m[0], "#" . substr($m[1], 0, 1) . substr($m[1], 2, 1) . substr($m[1], 4, 1), $tokens[$i][2]);
 						}
 					}
-				// Convert named color values ("black" to "#000" or "gray" to "#808080")
+				/**
+				 * Convert named color values if the configuration option "convert-named-color-values" is enabled.
+				 * 
+				 * This will convert named color value like "black" to their hexadecimal notation "#000".
+				 */
 				if ($sConvertNamedColorValues && preg_match($rConvertNamedColorValues, $tokens[$i][2]))
 					{
 					$tokens[$i][2] = preg_replace($rConvertNamedColorValues, $rConvertNamedColorValuesR, $tokens[$i][2]);
 					}
 				}
-			
 			}
 		/*
 		 * Create minified css
@@ -767,6 +1016,11 @@ class CssMin
 			if ($tokens[$i][0] == self::T_AT_RULE)
 				{
 				$r .= "@" . $tokens[$i][1] . " " . $tokens[$i][2] . ";";
+				}
+			// T_AT_IMPORT
+			if ($tokens[$i][0] == self::T_AT_IMPORT)
+				{
+				$r .= "@import \"" . $tokens[$i][1] . "\" " . implode(",", $tokens[$i][2]) . ";";
 				}
 			// T_AT_MEDIA_START
 			elseif ($tokens[$i][0] == self::T_AT_MEDIA_START)
@@ -813,7 +1067,7 @@ class CssMin
 			// T_DECLARATION
 			elseif ($tokens[$i][0] == self::T_DECLARATION)
 				{
-				// Convert CSS3 properties if 'convert-css3-properties' is enabled
+				// Convert CSS Level 3 and browser specific properties if "convert-css3-properties" is enabled
 				if ($sConvertCss3Properties && isset(self::$propertyTransformations[$tokens[$i][1]]))
 					{
 					foreach (self::$propertyTransformations[$tokens[$i][1]] as $value)
@@ -828,7 +1082,7 @@ class CssMin
 							}
 						}
 					}
-				$r .= $tokens[$i][1] . ":" . $tokens[$i][2] . ($sRemoveLastSemicolon && $tokens[$i+1][0] == self::T_DECLARATIONS_END ? "" : ";");
+				$r .= $tokens[$i][1] . ":" . $tokens[$i][2] . ($sRemoveLastSemicolon && (isset($tokens[$i+1]) &&$tokens[$i+1][0] == self::T_DECLARATIONS_END) ? "" : ";");
 				}
 			// T_DECLARATIONS_END, T_AT_MEDIA_END, T_AT_FONT_FACE_END, T_AT_PAGE_END
 			elseif (in_array($tokens[$i][0], array(self::T_DECLARATIONS_END, self::T_AT_MEDIA_END, self::T_AT_FONT_FACE_END, self::T_AT_PAGE_END)))
@@ -837,7 +1091,7 @@ class CssMin
 				}
 			else
 				{
-				// Tokens with no output: T_COMMENT, T_RULESET_START, T_RULESET_END, T_AT_VARIABLES_START, T_VARIABLE_DECLARATION and T_AT_VARIABLES_END
+				// Tokens with no output: T_NULL, T_COMMENT, T_RULESET_START, T_RULESET_END, T_AT_VARIABLES_START, T_VARIABLE_DECLARATION and T_AT_VARIABLES_END
 				}
 			}
 		return $r;
@@ -869,9 +1123,10 @@ class CssMin
 		$stringChar			= null;								// Current string delimiter char
 		$isFilterWs			= true;								// Filter double whitespaces? Will get disabled for comments, selectors, etc.
 		$selectors			= array();							// Array with collected selectors
+		$importUrl			= "";								// @import Url
 		$r 					= array();							// Return value
 		/*
-		 * Prepare css: normalize line endings, remove double line endings, tabs to spaces
+		 * Prepare: normalize line endings, remove double line endings, tabs to spaces
 		 */
 		$css = str_replace("\r\n", "\n", $css); // Windows to Unix line endings
 		$css = str_replace("\r", "\n", $css); // Mac to Unix line endings
@@ -881,13 +1136,13 @@ class CssMin
 			}
 		$css = str_replace("\t", " ", $css);
 		/**
-		 * Parse css
+		 * Parse:
 		 */
 		for ($i = 0, $l = strlen($css); $i < $l; $i++)
 			{
-			// Current Char
+			// Set the current Char
 			$c = substr($css, $i, 1);
-			// Filter out double spaces
+			// Filter double spaces
 			if ($isFilterWs && $c == " " && $c == $p)
 				{
 				continue;
@@ -900,11 +1155,13 @@ class CssMin
 				$currentState = $state[count($state) - 1];
 				/*
 				 * Start of comment
+				 * 
+				 * The current buffer will get saved and restored at the end of the comment because comments are 
+				 * allowed within many parsable elements.
 				 */
 				if ($p == "/" && $c == "*" && $currentState != self::T_STRING && $currentState != self::T_COMMENT)
 					{
-					// Save the buffer (will get restored with comment ending)
-					$saveBuffer = substr($buffer, 0, -2);
+					$saveBuffer = substr($buffer, 0, -2); // Save the current buffer 
 					$buffer 	= $p . $c;
 					$isFilterWs	= false;
 					array_push($state, self::T_COMMENT);
@@ -915,8 +1172,7 @@ class CssMin
 				elseif ($p == "*" && $c == "/" && $currentState == self::T_COMMENT)
 					{
 					$r[]		= array(self::T_COMMENT, trim($buffer));
-					// Restore the buffer
-					$buffer		= $saveBuffer;
+					$buffer		= $saveBuffer; // Restore the buffer
 					$isFilterWs	= true;
 					array_pop($state);
 					}
@@ -935,6 +1191,16 @@ class CssMin
 				elseif ($c == "\n" && $p == "\\" && $currentState == self::T_STRING)
 					{
 					$buffer = substr($buffer, 0, -2);
+					}
+				/**
+				 * Unescaped LF in string => string parse error; end string
+				 */
+				elseif ($c == "\n" && $p != "\\" && $currentState == self::T_STRING)
+					{
+					$buffer		= substr($buffer, 0, -1) . $stringChar; // Replace the LF with the current string char
+					$stringChar	= null;
+					$isFilterWs	= true;
+					array_pop($state);
 					}
 				/*
 				 * End of string
@@ -958,6 +1224,12 @@ class CssMin
 						}
 					// ...else end the string
 					$isFilterWs	= true;
+					// Special handling for @import url strings
+					if ($state[count($state) - 2] == self::T_AT_IMPORT)
+						{
+						$importUrl	= $buffer;
+						$buffer		= "";
+						}
 					array_pop($state);
 					$stringChar = null;
 					}
@@ -965,7 +1237,7 @@ class CssMin
 				 * Start of url string property
 				 */
 				elseif ($c == "(" && ($currentState != self::T_COMMENT && $currentState != self::T_STRING) && strtolower(substr($css, $i - 3, 3) == "url") 
-					&& ($currentState == self::T_DECLARATION || $currentState == self::T_FONT_FACE_DECLARATION || $currentState == self::T_PAGE_DECLARATION || $currentState == self::T_VARIABLE_DECLARATION))
+					&& ($currentState == self::T_DECLARATION || $currentState == self::T_FONT_FACE_DECLARATION || $currentState == self::T_PAGE_DECLARATION || $currentState == self::T_VARIABLE_DECLARATION || $currentState == self::T_AT_IMPORT))
 					{
 					array_push($state, self::T_STRING_URL);
 					}
@@ -977,6 +1249,12 @@ class CssMin
 					if ($p == "\\")
 						{
 						continue;
+						}
+					// Special handling for @import urls
+					if ($state[count($state) - 2] == self::T_AT_IMPORT)
+						{
+						$importUrl = $buffer;
+						$buffer = "";
 						}
 					array_pop($state);
 					}
@@ -1156,6 +1434,30 @@ class CssMin
 					array_pop($state);
 					}
 				/*
+				 * Start of at-rule @import
+				 */
+				elseif ($c == "@" && $currentState == self::T_DOCUMENT && strtolower(substr($css, $i, 7)) == "@import")
+					{
+					$i			= $i + 7;
+					$buffer 	= "";
+					array_push($state, self::T_AT_IMPORT);
+					}
+				/*
+				 * End of at-rule @import
+				 */
+				elseif (($c == ";" || $c == "\n") && $currentState == self::T_AT_IMPORT)
+					{
+					$scopes = array_filter(array_map("trim", explode(",", strtolower(trim($buffer, $sDefaultTrim . ";")))));
+					if (stripos($importUrl, "url(") !== false)
+						{
+						$importUrl = rtrim(substr($importUrl, 4), $sDefaultTrim . ")");
+						}
+					$importUrl	= trim($importUrl, $sDefaultTrim . "\"'");
+					$r[]		= array(self::T_AT_IMPORT, $importUrl, $scopes);
+					$buffer 	= "";
+					array_pop($state);
+					}
+				/*
 				 * Start of document level at-rule
 				 */
 				elseif ($c == "@" && $currentState == self::T_DOCUMENT)
@@ -1277,7 +1579,9 @@ class CssMin
 			}
 		}
 	/**
-	 * Convert a HSL value to hexadecimal notation. 
+	 * Convert a HSL value to hexadecimal notation.
+	 * 
+	 * Based on: {@link http://www.easyrgb.com/index.php?X=MATH&H=19#text19}.
 	 * 
 	 * @param integer $hue Hue
 	 * @param integer $saturation Saturation
