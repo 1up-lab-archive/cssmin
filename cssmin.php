@@ -16,7 +16,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		2.0.2.0083.beta3 (2011-02-01)
+ * @version		2.0.2.0085.beta3 (2011-02-02)
  */
 class CssMin
 	{
@@ -1110,12 +1110,14 @@ class CssMin
 		$sDefaultScope		= array("all");						// Default scope
 		$sDefaultTrim		= " \t\n\r\0\x0B";					// Default trim charlist
 		$sTokenChars		= "@{}();:\n\"'/*,";				// Tokens triggering parser processing
+		$sWhitespaceChars	= $sDefaultTrim;					// Whitespace chars
 		/*
 		 * Basic variables
 		 */
 		$c					= null;								// Current char
 		$p					= null;								// Previous char
 		$buffer 			= "";								// Buffer
+		$errors				= array();
 		$saveBuffer			= "";								// Saved buffer
 		$state				= array(self::T_DOCUMENT);			// State stack
 		$currentState		= self::T_DOCUMENT;					// Current state
@@ -1124,17 +1126,13 @@ class CssMin
 		$isFilterWs			= true;								// Filter double whitespaces? Will get disabled for comments, selectors, etc.
 		$selectors			= array();							// Array with collected selectors
 		$importUrl			= "";								// @import Url
+		$line				= 1;								// Line
 		$r 					= array();							// Return value
 		/*
-		 * Prepare: normalize line endings, remove double line endings, tabs to spaces
+		 * Prepare: normalize line endings
 		 */
 		$css = str_replace("\r\n", "\n", $css); // Windows to Unix line endings
 		$css = str_replace("\r", "\n", $css); // Mac to Unix line endings
-		while (strpos($css, "\n\n") !== false)
-			{
-			$css = str_replace("\n\n", "\n", $css);
-			}
-		$css = str_replace("\t", " ", $css);
 		/**
 		 * Parse:
 		 */
@@ -1142,10 +1140,24 @@ class CssMin
 			{
 			// Set the current Char
 			$c = substr($css, $i, 1);
-			// Filter double spaces
-			if ($isFilterWs && $c == " " && $c == $p)
+			// Increments line number on line endings
+			if ($c == "\n")
 				{
-				continue;
+				$line++;
+				}
+			// Whitespace handling
+			if ($isFilterWs && strpos($sWhitespaceChars, $c) !== false)
+				{
+				// Filter double whitespaces if the previous char is also a whitespace
+				if (strpos($sWhitespaceChars, $p) !== false)
+					{
+					continue;
+					}
+				// Normalize whitespace chars to space
+				elseif ($c != " " && strpos($sWhitespaceChars, $c) !== false)
+					{
+					$c = " ";
+					}
 				}
 			$buffer .= $c;
 			// Extended processing only if the current char is a token char
@@ -1193,10 +1205,14 @@ class CssMin
 					$buffer = substr($buffer, 0, -2);
 					}
 				/**
-				 * Unescaped LF in string => string parse error; end string
+				 * Parse error: Unescaped LF in string literal
 				 */
 				elseif ($c == "\n" && $p != "\\" && $currentState == self::T_STRING)
 					{
+					$errorStart	= strrpos($css, "\n", - ($l - strrpos($css, ":", -($l - $i + 2))));
+					$errorEnd	= strpos($css, "\n", $errorStart + 1);
+					$errorLine = trim(substr($css, $errorStart, $errorEnd - $errorStart));
+					trigger_error("Line #" . $line . ": Unescaped line ending in string literal:\n<code>" . $errorLine . "_</code>", E_USER_WARNING);
 					$buffer		= substr($buffer, 0, -1) . $stringChar; // Replace the LF with the current string char
 					$stringChar	= null;
 					$isFilterWs	= true;
@@ -1312,7 +1328,7 @@ class CssMin
 				/*
 				 * @font-face declaration: Value
 				 */
-				elseif (($c == ";" || $c == "}" || $c == "\n") && $currentState == self::T_FONT_FACE_DECLARATION)
+				elseif (($c == ";" || $c == "}") && $currentState == self::T_FONT_FACE_DECLARATION)
 					{
 					$value		= trim($buffer, $sDefaultTrim . ";}");
 					$r[]		= array(self::T_FONT_FACE_DECLARATION, $property, $value, $scope);
@@ -1323,6 +1339,16 @@ class CssMin
 						array_pop($state);
 						$r[]	= array(self::T_AT_FONT_FACE_END);
 						}
+					}
+				/*
+				 * Parse error: @font-face declaration value 
+				 */
+				elseif ($c == ":" && $currentState == self::T_FONT_FACE_DECLARATION)
+					{
+					$errorStart	= strrpos($css, "\n", -($l - strrpos($css, ":", -($l - $i + 2))));
+					$errorEnd	= strpos($css, "\n", $errorStart + 1);
+					$errorLine = trim(substr($css, $errorStart, $errorEnd - $errorStart));
+					trigger_error("Line #" . $line . ": Unterminated @font-face declaration:\n<code>" . $errorLine . "_</code>", E_USER_WARNING);
 					}
 				/*
 				 * End of at-rule @font-face block
@@ -1355,7 +1381,7 @@ class CssMin
 				/*
 				 * @page declaration: Value
 				 */
-				elseif (($c == ";" || $c == "}" || $c == "\n") && $currentState == self::T_PAGE_DECLARATION)
+				elseif (($c == ";" || $c == "}") && $currentState == self::T_PAGE_DECLARATION)
 					{
 					$value		= trim($buffer, $sDefaultTrim . ";}");
 					$r[]		= array(self::T_PAGE_DECLARATION, $property, $value, $scope);
@@ -1366,6 +1392,16 @@ class CssMin
 						array_pop($state);
 						$r[]	= array(self::T_AT_PAGE_END);
 						}
+					}
+				/*
+				 * 
+				 */
+				elseif ($c == ":" && $currentState == self::T_PAGE_DECLARATION)
+					{
+					$errorStart	= strrpos($css, "\n", -($l - strrpos($css, ":", -($l - $i + 2))));
+					$errorEnd	= strpos($css, "\n", $errorStart + 1);
+					$errorLine	= trim(substr($css, $errorStart, $errorEnd - $errorStart));
+					trigger_error("Line #" . $line . ": Unterminated @page declaration:\n<code>" . $errorLine . "_</code>", E_USER_WARNING);
 					}
 				/*
 				 * End of at-rule @page block
@@ -1410,7 +1446,7 @@ class CssMin
 				/*
 				 * @variables declaration: Value
 				 */
-				elseif (($c == ";" || $c == "}" || $c == "\n") && $currentState == self::T_VARIABLE_DECLARATION)
+				elseif (($c == ";" || $c == "}") && $currentState == self::T_VARIABLE_DECLARATION)
 					{
 					$value		= trim($buffer, $sDefaultTrim . ";}");
 					$r[]		= array(self::T_VARIABLE_DECLARATION, $property, $value, $scope);
@@ -1422,6 +1458,16 @@ class CssMin
 						$r[]	= array(self::T_AT_VARIABLES_END);
 						$scope	= $sDefaultScope;
 						}
+					}
+				/*
+				 * Parse error: @variable declaration value 
+				 */
+				elseif ($c == ":" && $currentState == self::T_VARIABLE_DECLARATION)
+					{
+					$errorStart	= strrpos($css, "\n", -($l - strrpos($css, ":", -($l - $i + 2))));
+					$errorEnd	= strpos($css, "\n", $errorStart + 1);
+					$errorLine	= trim(substr($css, $errorStart, $errorEnd - $errorStart));
+					trigger_error("Line #" . $line . ": Unterminated @variable declaration:\n<code>" . $errorLine . "_</code>", E_USER_WARNING);
 					}
 				/*
 				 * End of at-rule @variables block
@@ -1511,7 +1557,7 @@ class CssMin
 				/*
 				 * Declaration: Value
 				 */
-				elseif (($c == ";" || $c == "}" || $c == "\n") && $currentState == self::T_DECLARATION)
+				elseif (($c == ";" || $c == "}") && $currentState == self::T_DECLARATION)
 					{
 					$value		= trim($buffer, $sDefaultTrim . ";}");
 					$r[]		= array(self::T_DECLARATION, $property, $value, $scope);
@@ -1523,6 +1569,16 @@ class CssMin
 						$r[]	= array(self::T_DECLARATIONS_END);
 						$r[]	= array(self::T_RULESET_END);
 						}
+					}
+				/*
+				 * Parse error: declaration value
+				 */
+				elseif ($c == ":" && $currentState == self::T_DECLARATION)
+					{
+					$errorStart	= strrpos($css, "\n", -($l - strrpos($css, ":", -($l - $i + 2))));
+					$errorEnd	= strpos($css, "\n", $errorStart + 1);
+					$errorLine	= trim(substr($css, $errorStart, $errorEnd - $errorStart));
+					trigger_error("Line #" . $line . ": Unterminated declaration:\n<code>" . $errorLine . "_</code>", E_USER_WARNING);
 					}
 				/*
 				 * End of ruleset
