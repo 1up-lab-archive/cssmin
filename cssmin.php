@@ -16,7 +16,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		2.0.2.0085.beta3 (2011-02-02)
+ * @version		2.0.2 (2011-02-17)
  */
 class CssMin
 	{
