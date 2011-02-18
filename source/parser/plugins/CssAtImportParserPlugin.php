@@ -71,7 +71,7 @@ class CssAtImportParserPlugin extends aCssParserPlugin
 				}
 			else
 				{
-				new CssError("Invalid @import at-rule syntax", $this->parser->buffer);
+				trigger_error(new CssError("Invalid @import at-rule syntax", $this->parser->buffer), E_USER_WARNING);
 				}
 			$this->parser->popState();
 			}

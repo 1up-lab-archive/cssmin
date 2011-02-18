@@ -64,7 +64,7 @@ class CssUrlParserPlugin extends aCssParserPlugin
 			$this->parser->setBuffer(substr($this->parser->getBuffer(), 0, -1) . ")"); // Replace the LF with the url string delimiter
 			$this->parser->popState();
 			$this->parser->unsetExclusive();
-			new CssError("Unterminated string literal", $line . "_");
+			trigger_error(new CssError("Unterminated string literal", $line . "_"), E_USER_WARNING);
 			}
 		// End of string
 		elseif ($char === ")" && $state === "T_URL")

@@ -75,7 +75,7 @@ class CssAtVariablesParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			new CssError("Unterminated @variables declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_");
+			trigger_error(new CssError("Unterminated @variables declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
 			}
 		// End of @variables declaration
 		elseif (($char === ";" || $char === "}") && $state === "T_AT_VARIABLES_DECLARATION")

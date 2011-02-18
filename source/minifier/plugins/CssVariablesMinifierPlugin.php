@@ -85,7 +85,7 @@ class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 					}
 				}
 			// If no variable value was found trigger an error and replace the token with a CssNullToken
-			new CssError("No variable value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token);
+			trigger_error(new CssError("No variable value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token), E_USER_WARNING);
 			$token = new CssNullToken();
 			}
 		return false;

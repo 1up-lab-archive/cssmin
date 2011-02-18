@@ -75,7 +75,7 @@ class CssAtFontFaceParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			new CssError("Unterminated @font-face declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_");
+			trigger_error(new CssError("Unterminated @font-face declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
 			}
 		// End of @font-face declaration
 		elseif (($char === ";" || $char === "}") && $state === "T_AT_FONT_FACE_DECLARATION")

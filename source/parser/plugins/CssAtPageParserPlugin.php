@@ -76,7 +76,7 @@ class CssAtPageParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			new CssError("Unterminated @page declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_");
+			trigger_error(new CssError("Unterminated @page declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
 			}
 		// End of @page declaration
 		elseif (($char === ";" || $char === "}") && $state == "T_AT_PAGE_DECLARATION")

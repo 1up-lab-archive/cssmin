@@ -71,7 +71,7 @@ class CssStringParserPlugin extends aCssParserPlugin
 			$this->parser->popState();
 			$this->parser->unsetExclusive();
 			$this->parser->setBuffer(substr($this->parser->getBuffer(), 0, -1) . $this->delimiterChar); // Replace the LF with the current string char
-			new CssError("Unterminated string literal", $line . "_");
+			trigger_error(new CssError("Unterminated string literal", $line . "_"), E_USER_WARNING);
 			$this->delimiterChar = null;
 			}
 		// End of string

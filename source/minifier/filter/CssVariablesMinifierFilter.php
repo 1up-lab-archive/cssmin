@@ -79,7 +79,7 @@ class CssVariablesMinifierFilter extends aCssMinifierFilter
 			}
 		if (!($plugin = $this->minifier->getPlugin("CssVariablesMinifierPlugin")))
 			{
-			new CssError("The plugin <code>CssVariablesMinifierPlugin</code> was not found but is required for <code>" . __CLASS__ . "</code>");
+			trigger_error(new CssError("The plugin <code>CssVariablesMinifierPlugin</code> was not found but is required for <code>" . __CLASS__ . "</code>"), E_USER_WARNING);
 			}
 		else
 			{

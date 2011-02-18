@@ -78,7 +78,7 @@ class CssMinifier
 				}
 			else
 				{
-				new CssError("The filter <code>" . $filter . "</code> with the class name <code>" . $class . "</code> was not found");
+				trigger_error(new CssError("The filter <code>" . $filter . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
 				}
 			}
 		// Plugins
@@ -91,7 +91,7 @@ class CssMinifier
 				}
 			else
 				{
-				new CssError("The plugin <code>" . $plugin . "</code> with the class name <code>" . $class . "</code> was not found");
+				trigger_error(new CssError("The plugin <code>" . $plugin . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
 				}
 			}
 		if (!is_null($source))

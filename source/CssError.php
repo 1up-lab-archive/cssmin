@@ -21,33 +21,37 @@
 class CssError
 	{
 	/**
-	 * Level: Notice
+	 * Error message.
 	 * 
-	 * @var integer
+	 * @var string
 	 */
-	const NOTICE = E_USER_NOTICE;
+	public $Message = "";
 	/**
-	 * Level: Warning
+	 * Source.
 	 * 
-	 * @var integer
+	 * @var string
 	 */
-	const ERROR = E_USER_ERROR;
-	/**
-	 * Level: Error
-	 * 
-	 * @var integer
-	 */
-	const WARNING = E_USER_WARNING;
+	public $Source = "";
 	/**
 	 * Constructor triggering the error.
 	 * 
 	 * @param string $message Error message
-	 * @param string $line Corresponding line [optional]
-	 * @param integer $level Error level [optional]
+	 * @param string $source Corresponding line [optional]
+	 * @return void
 	 */
-	public function __construct($message, $line = "undefined", $level = self::WARNING)
+	public function __construct($message, $source = "")
 		{
-		trigger_error($message . ":<p><code>" . $line . "</code></p>", $level);
+		$this->Message	= $message;
+		$this->Source	= $source;
+		}
+	/**
+	 * Returns the error as formatted string.
+	 * 
+	 * @return string
+	 */	
+	public function __toString()
+		{
+		return $this->Message . ":<p><code>" . $this->Source . "</code></p>";
 		}
 	}
 ?>
