@@ -34,7 +34,7 @@ class CssMinifier
 	private $defaults = array
 		(
 		"filters" => "RemoveComments, RemoveEmptyRulesets, RemoveEmptyAtBlocks, ConvertLevel3Properties, RemoveLastDelarationSemiColon, Variables",
-		"plugins" => "Variables, ConvertFontWeight, ConvertHslColors, ConvertRgbColors, ConvertNamedColors, CompressColorValues, CompressUnitValues"
+		"plugins" => "Variables, ConvertFontWeight, ConvertHslColors, ConvertRgbColors, ConvertNamedColors, CompressColorValues, CompressUnitValues, CompressExpressionValues"
 		);
 	/**
 	 * {@link aCssMinifierFilter Filters}.

@@ -40,6 +40,7 @@ class CssParser
 		"CssCommentParserPlugin",
 		"CssStringParserPlugin",
 		"CssUrlParserPlugin",
+		"CssExpressionParserPlugin",
 		"CssRulesetParserPlugin",
 		"CssAtCharsetParserPlugin",
 		"CssAtFontFaceParserPlugin",
@@ -381,9 +382,8 @@ class CssParser
 		{
 		$this->stateMediaTypes = $mediaTypes; 
 		}
-	
 	/**
-	 * Sets the current state in the state stack.
+	 * Sets the current state in the state stack; equals to {@link CssParser::popState()} + {@link CssParser::pushState()}.
 	 * 
 	 * @param integer $state State to set
 	 * @return integer
