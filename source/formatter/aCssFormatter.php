@@ -11,36 +11,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * --
  * 
- *  This {@link aCssToken CSS token} represents the start of a @media at-rule block.
- * --
- *
- * @package		CssMin/Tokens
+ * @package		CssMin/Formatter
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtMediaStartToken extends aCssToken
+abstract class aCssFormatter
 	{
+	protected $ident = "    ";
+	protected $padding = 0;
 	/**
-	 * Sets the properties of the @media at-rule.
+	 * --
 	 * 
-	 * @param array $mediaTypes Media types
+	 * @var array
+	 */
+	protected $tokens = array();
+	/**
+	 * --
+	 * 
+	 * @param array $tokens
 	 * @return void
 	 */
-	public function __construct(array $mediaTypes = array())
+	public function __construct(array $tokens, $indent = null, $padding = null)
 		{
-		$this->MediaTypes = $mediaTypes;
+		$this->tokens	= $tokens;
+		$this->indent	= !is_null($indent) ? $indent : "    ";
+		$this->padding	= !is_null($padding) ? $padding : 0;
 		}
 	/**
-	 * Implements {@link aCssToken::__toString()}.
+	 * --
 	 * 
 	 * @return string
 	 */
-	public function __toString()
-		{
-		return "@media " . implode(",", $this->MediaTypes) . "{";
-		}
+	abstract public function __toString();
 	}
 ?>

@@ -15,7 +15,7 @@
  * add, edit or delete tokens.
  * --
  * 
- * @package		CssMin
+ * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
@@ -43,8 +43,8 @@ abstract class aCssMinifierFilter
 	/**
 	 * Filter the tokens.
 	 * 
-	 * @param array $tokens Array of objects of the type aCssToken
-	 * @return integer Count of changed or removed tokens; a return value large than 0 will rebuild the array
+	 * @param array $tokens Array of objects of type aCssToken
+	 * @return integer Count of added, changed or removed tokens; a return value large than 0 will rebuild the array
 	 */
 	abstract public function apply(array &$tokens);
 	}

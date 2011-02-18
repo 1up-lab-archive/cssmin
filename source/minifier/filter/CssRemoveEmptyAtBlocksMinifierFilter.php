@@ -14,7 +14,7 @@
  * This {@link aCssMinifierFilter minifier filter} will remove any empty @font-faxce, @media and @page at-rule blocks.
  * --
  * 
- * @package		CssMin
+ * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
@@ -26,8 +26,8 @@ class CssRemoveEmptyAtBlocksMinifierFilter extends aCssMinifierFilter
 	/**
 	 * Implements {@link aCssMinifierFilter::filter()}.
 	 * 
-	 * @param array $tokens
-	 * @return integer
+	 * @param array $tokens Array of objects of type aCssToken
+	 * @return integer Count of added, changed or removed tokens; a return value large than 0 will rebuild the array
 	 */
 	public function apply(array &$tokens)
 		{

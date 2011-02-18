@@ -15,7 +15,7 @@
  * strings get parsed properly and will return no token.
  * --
  * 
- * @package		CssMin
+ * @package		CssMin/Parser/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
@@ -39,15 +39,15 @@ class CssUrlParserPlugin extends aCssParserPlugin
 	/**
 	 * Implements {@link aCssParserPlugin::parse()}.
 	 * 
-	 * @param integer $index Current index of the CssParser
+	 * @param integer $index Current index
 	 * @param string $char Current char
 	 * @param string $previousChar Previous char
-	 * @return boolean
+	 * @return mixed TRUE will break the processing; FALSE continue with the next plugin; integer set a new index and break the processing
 	 */
 	public function parse($index, $char, $previousChar, $state)
 		{
 		// Start of string
-		if ($char === "(" && strtolower(substr($this->parser->getSource(), $index - 3, 4)) === "url(" && $state != "T_URL")
+		if ($char === "(" && strtolower(substr($this->parser->getSource(), $index - 3, 4)) === "url(" && $state !== "T_URL")
 			{
 			$this->parser->pushState("T_URL");
 			$this->parser->setExclusive(__CLASS__);

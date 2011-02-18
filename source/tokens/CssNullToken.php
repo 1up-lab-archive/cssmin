@@ -14,7 +14,7 @@
  * This {@link aCssToken CSS token} is a utility token that extends {@link aNullToken} and returns only a empty string.
  * --
  *
- * @package		CssMin
+ * @package		CssMin/Tokens
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>

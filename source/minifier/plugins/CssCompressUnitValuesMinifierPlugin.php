@@ -29,7 +29,7 @@
  * 
  * --
  *
- * @package		CssMin
+ * @package		CssMin/Minifier/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>

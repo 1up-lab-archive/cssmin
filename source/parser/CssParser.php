@@ -15,7 +15,7 @@
  *  
  * --
  *
- * @package		CssMin
+ * @package		CssMin/Parser
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
@@ -29,13 +29,13 @@ class CssParser
 	 * 
 	 * @var string
 	 */
-	public $buffer = "";
+	private $buffer = "";
 	/**
 	 * {@link aCssParserPlugin Plugins}.
 	 * 
 	 * @var array
 	 */
-	protected $plugins = array
+	private $plugins = array
 		(
 		"CssCommentParserPlugin",
 		"CssStringParserPlugin",
@@ -228,7 +228,6 @@ class CssParser
 	 */
 	public function parse($source)
 		{
-		##StopWatch::start("PARSER: Start");
 		// Reset
 		$this->source = "";
 		$this->tokens = array();
@@ -276,7 +275,7 @@ class CssParser
 				continue;
 				}
 			$buffer .= $c;
-			// Extended processing only if the current char is one of the globale trigger chars
+			// Extended processing only if the current char is a global trigger char
 			if (strpos($globalTriggerChars, $c) !== false)
 				{
 				// Exclusive state is set; process with the exclusive plugin 
@@ -327,7 +326,6 @@ class CssParser
 				}
 			$p = $c; // Set the parent char
 			}
-		##StopWatch::tick("PARSER: End");
 		return $this->tokens;
 		}
 	/**
@@ -361,7 +359,7 @@ class CssParser
 	 */	
 	public function setBuffer($buffer)
 		{
-		$this->buffer = $buffer; 
+		$this->buffer = $buffer;
 		}
 	/**
 	 * Set the exclusive state.

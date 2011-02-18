@@ -16,7 +16,7 @@
  * {@link CssAtPageEndToken} tokens.
  * --
  * 
- * @package		CssMin
+ * @package		CssMin/Parser/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
@@ -40,10 +40,10 @@ class CssAtPageParserPlugin extends aCssParserPlugin
 	/**
 	 * Implements {@link aCssParserPlugin::parse()}.
 	 * 
-	 * @param integer $index Current index of the CssParser
+	 * @param integer $index Current index
 	 * @param string $char Current char
 	 * @param string $previousChar Previous char
-	 * @return boolean
+	 * @return mixed TRUE will break the processing; FALSE continue with the next plugin; integer set a new index and break the processing
 	 */
 	public function parse($index, $char, $previousChar, $state)
 		{
@@ -67,6 +67,16 @@ class CssAtPageParserPlugin extends aCssParserPlugin
 			{
 			$this->parser->pushState("T_AT_PAGE_DECLARATION");
 			$this->buffer = $this->parser->getAndClearBuffer(":", true);
+			}
+		// Unterminated @font-face declaration
+		elseif ($char === ":" && $state === "T_AT_PAGE_DECLARATION")
+			{
+			// Ignore Internet Explorer filter declarations
+			if ($this->buffer === "filter")
+				{
+				return false;
+				}
+			new CssError("Unterminated @page declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_");
 			}
 		// End of @page declaration
 		elseif (($char === ";" || $char === "}") && $state == "T_AT_PAGE_DECLARATION")

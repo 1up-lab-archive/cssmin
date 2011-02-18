@@ -11,12 +11,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * --
  * 
- * Abstract definition of a parser plugin class. Parser plugin contains the logic for parsing adn creating one or more 
+ * Abstract definition of a parser plugin class. Parser plugin contains the logic for parsing and creating one or more 
  * tokens.
  * 
  * --
  * 
- * @package		CssMin
+ * @package		CssMin/Parser/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
@@ -62,10 +62,10 @@ abstract class aCssParserPlugin
 	/**
 	 * Parser routine of the plugin.
 	 * 
-	 * @param integer $index Current index of the CssParser
+	 * @param integer $index Current index
 	 * @param string $char Current char
 	 * @param string $previousChar Previous char
-	 * @return boolean
+	 * @return mixed TRUE will break the processing; FALSE continue with the next plugin; integer set a new index and break the processing
 	 */
 	abstract public function parse($index, $char, $previousChar, $state);
 	}

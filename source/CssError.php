@@ -39,11 +39,11 @@ class CssError
 	 */
 	const WARNING = E_USER_WARNING;
 	/**
-	 * --
+	 * Constructor triggering the error.
 	 * 
-	 * @param string $message
-	 * @param string $line
-	 * @param integer $level
+	 * @param string $message Error message
+	 * @param string $line Corresponding line [optional]
+	 * @param integer $level Error level [optional]
 	 */
 	public function __construct($message, $line = "undefined", $level = self::WARNING)
 		{

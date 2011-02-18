@@ -15,7 +15,7 @@
  * get parsed properly and will return no token. 
  * --
  *
- * @package		CssMin
+ * @package		CssMin/Parser/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
@@ -43,26 +43,17 @@ class CssStringParserPlugin extends aCssParserPlugin
 	 */
 	private $delimiterChar = null;
 	/**
-	 * Implements {@link aCssParserPlugin::getTokenChars()}.
-	 * 
-	 * @return string
-	 */
-	public function getTriggerChars()
-		{
-		return "\"'\n";
-		}
-	/**
 	 * Implements {@link aCssParserPlugin::parse()}.
 	 * 
-	 * @param integer $index Current index of the CssParser
+	 * @param integer $index Current index
 	 * @param string $char Current char
 	 * @param string $previousChar Previous char
-	 * @return boolean
+	 * @return mixed TRUE will break the processing; FALSE continue with the next plugin; integer set a new index and break the processing
 	 */
 	public function parse($index, $char, $previousChar, $state)
 		{
 		// Start of string
-		if (($char === "\"" || $char === "'") && $state ==! "T_STRING")
+		if (($char === "\"" || $char === "'") && $state !== "T_STRING")
 			{
 			$this->delimiterChar = $char;
 			$this->parser->pushState("T_STRING");
@@ -86,7 +77,6 @@ class CssStringParserPlugin extends aCssParserPlugin
 		// End of string
 		elseif ($char === $this->delimiterChar && $state === "T_STRING")
 			{
-			
 			// If the Previous char is a escape char count the amount of the previous escape chars. If the amount of 
 			// escape chars is uneven do not end the string
 			if ($previousChar == "\\")

@@ -16,7 +16,7 @@
  * 
  * --
  * 
- * @package		CssMin
+ * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
@@ -107,7 +107,7 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 		"column-span"					=> array(null, "-webkit-column-span", null, null),
 		"column-width"					=> array("-moz-column-width", "-webkit-column-width", null, null),
 		"columns"						=> array(null, "-webkit-columns", null, null),
-		"filter"						=> array(null, null, null, "-ms-filter"),
+		"filter"						=> array(__CLASS__, "filter"),
 		"float-edge"					=> array("-moz-float-edge", null, null, null),
 		"font-feature-settings"			=> array("-moz-font-feature-settings", null, null, null),
 		"font-language-override"		=> array("-moz-font-language-override", null, null, null),
@@ -241,8 +241,8 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 	/**
 	 * Implements {@link aCssMinifierFilter::filter()}.
 	 * 
-	 * @param array $tokens
-	 * @return integer
+	 * @param array $tokens Array of objects of type aCssToken
+	 * @return integer Count of added, changed or removed tokens; a return value large than 0 will rebuild the array
 	 */
 	public function apply(array &$tokens)
 		{
@@ -286,6 +286,21 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 					}
 				}
 			}
+		return $r;
+		}
+	/**
+	 * Transforms the Internet Explorer specific declaration property "filter" to Internet Explorer 8+ compatible 
+	 * declaratiopn property "-ms_filter". 
+	 * 
+	 * @param aCssToken $token
+	 * @return array
+	 */
+	private static function filter($token)
+		{
+		$r = array
+			(
+			new CssRulesetDeclarationToken("-ms-filter", "\"" . $token->Value . "\"", $token->MediaTypes),
+			);
 		return $r;
 		}
 	/**

@@ -11,7 +11,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * --
  *
- * @package		CssMin
+ * @package		CssMin/Minifier
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
@@ -57,7 +57,7 @@ class CssMinifier
 	/**
 	 * Constructer.
 	 * 
-	 * Creates instances of the used {@link aCssMinifierFilter filters} and {@link aCssMinifierPlugin plugins}.
+	 * Creates instances of {@link aCssMinifierFilter filters} and {@link aCssMinifierPlugin plugins}.
 	 * 
 	 * @param string $source CSS source
 	 * @param array $config Configuration [optional]
@@ -138,7 +138,6 @@ class CssMinifier
 		// Variables
 		$r				= "";
 		$parser			= new CssParser($source);
-		##StopWatch::tick("MINIFIER: Start");
 		$tokens			= $parser->getTokens();
 		$filters 		= $this->filters;
 		$filterCount	= count($this->filters);
@@ -173,7 +172,6 @@ class CssMinifier
 			$r .= (string) $tokens[$i];
 			}
 		$this->minified = $r;
-		##dump(StopWatch::end("MINIFIER: End"));die;
 		return $r;
 		}
 	}

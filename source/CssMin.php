@@ -21,20 +21,14 @@
 class CssMin
 	{
 	/**
-	 * Index for unsed by the {@link CssMin::autoload()} method.
-	 * 
-	 * @var array
-	 */
-	private static $autoload = array();
-	/**
 	 * Create a build version of CssMin.
 	 * 
 	 * The php source get minifed by using the php function {@link http://goo.gl/eIcoH php_strip_whitespace()}.
 	 * 
-	 * @param string $to
-	 * @return string
+	 * @param string $target Path includign file name were the build version should be saved [optional]
+	 * @return string Minifed build version
 	 */
-	public static function build($target)
+	public static function build($target = "")
 		{
 		$files		= array();
 		$source		= "";
@@ -78,7 +72,7 @@ class CssMin
 		unlink($tmp);
 		// Add the main comment and save the file
 		$source = str_replace("<?php", "<?php\n" . $comment, $source);
-		if (file_put_contents($target, $source) === false)
+		if ($target && file_put_contents($target, $source) === false)
 			{
 			return false;
 			}
@@ -92,9 +86,28 @@ class CssMin
 	 */
 	public static function autoload($class)
 		{
-		if (isset(self::$autoload[$class]))
+		static $index = null;
+		// Create the class index for autoloading
+		if (is_null($index))
 			{
-			require(self::$autoload[$class]);
+			$index = array();
+			$paths = array(dirname(__FILE__));
+			while (list($i, $path) = each($paths))
+				{
+				foreach (glob($path . "*", GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT) as $subDirectory)
+					{
+					$paths[] = $subDirectory;
+					}
+				foreach (glob($path . "*.php", 0) as $file)
+					{
+					$class = substr(basename($file), 0, -4);
+					$index[$class] = $file;
+					}
+				}
+			}
+		if (isset($index[$class]))
+			{
+			require($index[$class]);
 			return true;
 			}
 		return false;
@@ -106,33 +119,31 @@ class CssMin
 	 */
 	public static function initialise()
 		{
-		// Create the class index for autoloading
-		$paths = array(dirname(__FILE__));
-		while (list($i, $path) = each($paths))
-			{
-			foreach (glob($path . "*", GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT) as $subDirectory)
-				{
-				$paths[] = $subDirectory;
-				}
-			foreach (glob($path . "*.php", 0) as $file)
-				{
-				$class = substr(basename($file), 0, -4);
-				self::$autoload[$class] = $file;
-				}
-			}
 		spl_autoload_register(array(__CLASS__, "autoload"));
 		}
 	/**
-	 * Minifies css source.
+	 * Minifies CSS source.
 	 * 
-	 * @param string $source Css source
-	 * @return string Minified css
+	 * @param string $source CSS source
+	 * @return string Minified CSS
 	 */
 	public static function minify($source)
 		{
 		$minifier = new CssMinifier($source);
 		return $minifier->getMinified();
 		}
+	/**
+	 * Parse the CSS source.
+	 * 
+	 * @param string $source CSS source
+	 * @return array Array of aCssToken
+	 */
+	public static function parse($source)
+		{
+		$parser = new CssParser($source);
+		return $parser->getTokens();
+		}
 	}
+// Initialises CssMin
 CssMin::initialise();
 ?>
