@@ -1,41 +1,36 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * {@link aCssParserPlugin Parser plugin} for preserve parsing url() values.
  * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
- * This {@link aCssParserPlugin parser plugin} is responsible for parsing url string. This plugin only makes sure url
- * strings get parsed properly and will return no token.
- * --
+ * This plugin return no {@link aCssToken CssToken} but ensures that url() values will get parsed properly.
  * 
  * @package		CssMin/Parser/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssUrlParserPlugin extends aCssParserPlugin
 	{
 	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_CHARS}.
+	 * Implements {@link aCssParserPlugin::getTriggerChars()}.
 	 * 
-	 * @var string
+	 * @return array
 	 */
-	const TRIGGER_CHARS = "()";
+	public function getTriggerChars()
+		{
+		return array("(", ")");
+		}
 	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_STATES}.
+	 * Implements {@link aCssParserPlugin::getTriggerStates()}.
 	 * 
-	 * @var string
+	 * @return array
 	 */
-	const TRIGGER_STATES = false;
+	public function getTriggerStates()
+		{
+		return false;
+		}
 	/**
 	 * Implements {@link aCssParserPlugin::parse()}.
 	 * 
@@ -64,7 +59,7 @@ class CssUrlParserPlugin extends aCssParserPlugin
 			$this->parser->setBuffer(substr($this->parser->getBuffer(), 0, -1) . ")"); // Replace the LF with the url string delimiter
 			$this->parser->popState();
 			$this->parser->unsetExclusive();
-			trigger_error(new CssError("Unterminated string literal", $line . "_"), E_USER_WARNING);
+			trigger_error(new CssError(__METHOD__ . ": Unterminated string literal", $line . "_"), E_USER_WARNING);
 			}
 		// End of string
 		elseif ($char === ")" && $state === "T_URL")

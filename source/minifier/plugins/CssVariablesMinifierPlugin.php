@@ -1,20 +1,11 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
- * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
  * This {@link aCssMinifierPlugin} will process var-statement and sets the declaration value to the variable value. 
- * This plugin only apply the variable values. The variable values itself will get parsed by the
- * {@link CssVariablesMinifierFilter}. Example:
  * 
+ * This plugin only apply the variable values. The variable values itself will get parsed by the
+ * {@link CssVariablesMinifierFilter}.
+ * 
+ * Example:
  * <code>
  * @variables
  * 		{
@@ -24,7 +15,6 @@
  * </code>
  * 
  * Will get converted to:
- * 
  * <code>
  * color:black;
  * </code>
@@ -34,7 +24,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 	{
@@ -69,8 +59,8 @@ class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 		{
 		if (get_class($token) === "CssRulesetDeclarationToken" && stripos($token->Value, "var") !== false && preg_match($this->reMatch, $token->Value, $m))
 			{
-			$variable = trim($m[1]);
-			$mediaTypes = $token->MediaTypes;
+			$variable	= trim($m[1]);
+			$mediaTypes	= $token->MediaTypes;
 			if (!in_array("all", $mediaTypes))
 				{
 				$mediaTypes[] = "all";
@@ -80,12 +70,12 @@ class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 				if (isset($this->variables[$mediaType], $this->variables[$mediaType][$variable]))
 					{
 					// Variable value found => set the declaration value to the variable value and return
-					$token->Value = $this->variables[$mediaType][$variable];
+					$token->Value = str_replace($m[0], $this->variables[$mediaType][$variable], $token->Value);
 					return false;
 					}
 				}
-			// If no variable value was found trigger an error and replace the token with a CssNullToken
-			trigger_error(new CssError("No variable value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token), E_USER_WARNING);
+			// If no value was found trigger an error and replace the token with a CssNullToken
+			trigger_error(new CssError(__METHOD__ . ": No value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token), E_USER_WARNING);
 			$token = new CssNullToken();
 			}
 		return false;

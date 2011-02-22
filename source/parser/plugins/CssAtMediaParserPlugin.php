@@ -1,41 +1,38 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * {@link aCssParserPlugin Parser plugin} for parsing @media at-rule block.
  * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
- * This {@link aCssParserPlugin parser plugin} is responsible for parsing the @media at-rule block returns the 
- * {@link CssAtMediaStartToken} and {@link CssAtMediaEndToken} tokens.
- * --
+ * Found @media at-rule blocks will add a {@link CssAtMediaStartToken} and {@link CssAtMediaEndToken} to the parser. 
+ * This plugin will also set the the current media types using {@link CssParser::setMediaTypes()} and
+ * {@link CssParser::unsetMediaTypes()}.
  *
  * @package		CssMin/Parser/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssAtMediaParserPlugin extends aCssParserPlugin
 	{
 	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_CHARS}.
+	 * Implements {@link aCssParserPlugin::getTriggerChars()}.
 	 * 
-	 * @var string
+	 * @return array
 	 */
-	const TRIGGER_CHARS = "@{}";
+	public function getTriggerChars()
+		{
+		return array("@", "{", "}");
+		}
 	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_STATES}.
+	 * Implements {@link aCssParserPlugin::getTriggerStates()}.
 	 * 
-	 * @var string
+	 * @return array
 	 */
-	const TRIGGER_STATES = "T_DOCUMENT,T_AT_MEDIA::PREPARE,T_AT_MEDIA";
+	public function getTriggerStates()
+		{
+		return array("T_DOCUMENT", "T_AT_MEDIA::PREPARE", "T_AT_MEDIA");
+		}
 	/**
 	 * Implements {@link aCssParserPlugin::parse()}.
 	 * 

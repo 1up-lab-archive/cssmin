@@ -1,41 +1,16 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * CSS Minifier.
  * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- *
  * @package		CssMin/Minifier
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssMinifier
 	{
-	/**
-	 * Configuration.
-	 * 
-	 * @var array
-	 */
-	private $config = array();
-	/**
-	 * Default configuration.
-	 * 
-	 * @var array
-	 */
-	private $defaults = array
-		(
-		"filters" => "RemoveComments, RemoveEmptyRulesets, RemoveEmptyAtBlocks, ConvertLevel3Properties, RemoveLastDelarationSemiColon, Variables",
-		"plugins" => "Variables, ConvertFontWeight, ConvertHslColors, ConvertRgbColors, ConvertNamedColors, CompressColorValues, CompressUnitValues, CompressExpressionValues"
-		);
 	/**
 	 * {@link aCssMinifierFilter Filters}.
 	 *  
@@ -60,40 +35,67 @@ class CssMinifier
 	 * Creates instances of {@link aCssMinifierFilter filters} and {@link aCssMinifierPlugin plugins}.
 	 * 
 	 * @param string $source CSS source
-	 * @param array $config Configuration [optional]
+	 * @param array $filters Filter configuration [optional]
+	 * @param array $plugins Plugin configuration [optional]
 	 * @return void
 	 */
-	public function __construct($source = null, array $config = array())
+	public function __construct($source = null, array $filters = null, array $plugins = null)
 		{
-		$this->config = $config;
-		$filters = array_values(array_filter(array_map("trim", explode(",", (isset($config["filters"]) ? $config["filters"] : $this->defaults["filters"])))));
-		$plugins = array_values(array_filter(array_map("trim", explode(",", (isset($config["plugins"]) ? $config["plugins"] : $this->defaults["plugins"])))));
+		$filters = array_merge(array
+			(
+			"ImportImports"					=> false,
+			"RemoveComments"				=> true, 
+			"RemoveEmptyRulesets"			=> true,
+			"RemoveEmptyAtBlocks"			=> true,
+			"RemoveLastDelarationSemiColon"	=> true,
+			"ConvertLevel3Properties"		=> false,
+			"Variables"						=> true
+			), is_array($filters) ? $filters : array());
+		$plugins = array_merge(array
+			(
+			"Variables"						=> true,
+			"ConvertFontWeight"				=> false,
+			"ConvertHslColors"				=> false,
+			"ConvertRgbColors"				=> false,
+			"ConvertNamedColors"			=> true,
+			"CompressColorValues"			=> true,
+			"CompressUnitValues"			=> true,
+			"CompressExpressionValues"		=> true
+			), is_array($plugins) ? $plugins : array());
 		// Filters
-		foreach ($filters as $i => $filter)
+		foreach ($filters as $name => $config)
 			{
-			$class = "Css" . $filter . "MinifierFilter";
-			if (class_exists($class))
+			if ($config !== false)
 				{
-				$this->filters[$i] = new $class($this);
-				}
-			else
-				{
-				trigger_error(new CssError("The filter <code>" . $filter . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
+				$class	= "Css" . $name . "MinifierFilter";
+				$config = is_array($config) ? $config : array();
+				if (class_exists($class))
+					{
+					$this->filters[] = new $class($this, $config);
+					}
+				else
+					{
+					trigger_error(new CssError(__METHOD__ . ": The filter <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
+					}
 				}
 			}
-		// Plugins
-		foreach ($plugins as $i => $plugin)
+		foreach ($plugins as $name => $config)
 			{
-			$class = "Css" . $plugin . "MinifierPlugin";
-			if (class_exists($class))
+			if ($config !== false)
 				{
-				$this->plugins[$i] = new $class($this);
-				}
-			else
-				{
-				trigger_error(new CssError("The plugin <code>" . $plugin . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
+				$class	= "Css" . $name . "MinifierPlugin";
+				$config = is_array($config) ? $config : array();
+				if (class_exists($class))
+					{
+					$this->plugins[] = new $class($this, $config);
+					}
+				else
+					{
+					trigger_error(new CssError(__METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
+					}
 				}
 			}
+		// --
 		if (!is_null($source))
 			{
 			$this->minify($source);

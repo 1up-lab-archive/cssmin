@@ -1,41 +1,37 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * {@link aCssParserPlugin Parser plugin} for parsing ruleset block with including declarations.
  * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
- * This {@link aCssParserPlugin parser plugin} is responsible for parsing rulesets and the containing declarations. It 
- * returns the {@link CssRulesetStartToken}, {@link CssRulesetDeclarationToken} and {@link CssRulesetEndToken} tokens.
- * --
+ * Found rulesets will add a {@link CssRulesetStartToken} and {@link CssRulesetEndToken} to the 
+ * parser; including declarations as {@link CssRulesetDeclarationToken}.
  *
  * @package		CssMin/Parser/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssRulesetParserPlugin extends aCssParserPlugin
 	{
 	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_CHARS}.
+	 * Implements {@link aCssParserPlugin::getTriggerChars()}.
 	 * 
-	 * @var string
+	 * @return array
 	 */
-	const TRIGGER_CHARS = ",{}:;";
+	public function getTriggerChars()
+		{
+		return array(",", "{", "}", ":", ";");
+		}
 	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_STATES}.
+	 * Implements {@link aCssParserPlugin::getTriggerStates()}.
 	 * 
-	 * @var string
+	 * @return array
 	 */
-	const TRIGGER_STATES = "T_DOCUMENT,T_AT_MEDIA,T_RULESET::SELECTORS,T_RULESET,T_RULESET_DECLARATION";
+	public function getTriggerStates()
+		{
+		return array("T_DOCUMENT", "T_AT_MEDIA", "T_RULESET::SELECTORS", "T_RULESET", "T_RULESET_DECLARATION");
+		}
 	/**
 	 * Selectors.
 	 * 
@@ -55,7 +51,7 @@ class CssRulesetParserPlugin extends aCssParserPlugin
 		// Start of Ruleset and selectors
 		if ($char === "," && ($state === "T_DOCUMENT" || $state === "T_AT_MEDIA" || $state === "T_RULESET::SELECTORS"))
 			{
-			if ($state != "T_RULESET::SELECTORS")
+			if ($state !== "T_RULESET::SELECTORS")
 				{
 				$this->parser->pushState("T_RULESET::SELECTORS");
 				}
@@ -90,7 +86,7 @@ class CssRulesetParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			trigger_error(new CssError("Unterminated declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
+			trigger_error(new CssError(__METHOD__ . ": Unterminated declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
 			}
 		// End of declaration
 		elseif (($char === ";" || $char === "}") && $state === "T_RULESET_DECLARATION")

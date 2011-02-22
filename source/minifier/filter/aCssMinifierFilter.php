@@ -1,31 +1,27 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * Abstract definition of a minifier filter class. 
  * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
- * Abstract definition of a minifier filter class. Minifier filters allows a pre-processing of the parsed token to
- * add, edit or delete tokens.
- * --
+ * Minifier filters allows a pre-processing of the parsed token to add, edit or delete tokens. Every minifier filter
+ * has to extend this class.
  * 
  * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 abstract class aCssMinifierFilter
 	{
 	/**
-	 * The CssMinifier of the plugin.
+	 * Filter configuration.
+	 * 
+	 * @var array
+	 */
+	protected $configuration = array();
+	/**
+	 * The CssMinifier of the filter.
 	 * 
 	 * @var CssMinifier
 	 */
@@ -34,11 +30,13 @@ abstract class aCssMinifierFilter
 	 * Constructor.
 	 * 
 	 * @param CssMinifier $minifier The CssMinifier object of this plugin.
+	 * @param array $configuration Filter configuration [optional]
 	 * @return void
 	 */
-	public function __construct(CssMinifier $minifier)
+	public function __construct(CssMinifier $minifier, array $configuration = array())
 		{
-		$this->minifier = $minifier;
+		$this->configuration	= $configuration;
+		$this->minifier			= $minifier;
 		}
 	/**
 	 * Filter the tokens.

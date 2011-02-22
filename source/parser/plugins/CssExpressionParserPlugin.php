@@ -1,43 +1,49 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * {@link aCssParserPlugin Parser plugin} for preserve parsing expression() declaration values.
  * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
- * This {@link aCssParserPlugin parser plugin} handles expression() declaration values. 
- * --
+ * This plugin return no {@link aCssToken CssToken} but ensures that expression() declaration values will get parsed 
+ * properly.
  * 
  * @package		CssMin/Parser/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssExpressionParserPlugin extends aCssParserPlugin
 	{
 	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_CHARS}.
+	 * Count of left braces.
 	 * 
-	 * @var string
+	 * @var integer
 	 */
-	const TRIGGER_CHARS = "();}";
-	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_STATES}.
-	 * 
-	 * @var string
-	 */
-	const TRIGGER_STATES = false;
-	
 	private $leftBraces = 0;
+	/**
+	 * Count of right braces.
+	 * 
+	 * @var integer
+	 */
 	private $rightBraces = 0;
+	/**
+	 * Implements {@link aCssParserPlugin::getTriggerChars()}.
+	 * 
+	 * @return array
+	 */
+	public function getTriggerChars()
+		{
+		return array("(", ")", ";", "}");
+		}
+	/**
+	 * Implements {@link aCssParserPlugin::getTriggerStates()}.
+	 * 
+	 * @return array
+	 */
+	public function getTriggerStates()
+		{
+		return false;
+		}
 	/**
 	 * Implements {@link aCssParserPlugin::parse()}.
 	 * 
@@ -64,16 +70,12 @@ class CssExpressionParserPlugin extends aCssParserPlugin
 			{
 			$this->rightBraces++;
 			}
-		// Possible end of expression
+		// Possible end of expression; if left and right braces are equal the expressen ends
 		elseif (($char === ";" || $char === "}") && $state === "T_EXPRESSION" && $this->leftBraces === $this->rightBraces)
 			{
-			// If left and right braces are equal the expressen ends
-			if ($this->leftBraces === $this->rightBraces)
-				{
-				$this->leftBraces = $this->rightBraces = 0;
-				$this->parser->popState();
-				return $index - 1;
-				}
+			$this->leftBraces = $this->rightBraces = 0;
+			$this->parser->popState();
+			return $index - 1;
 			}
 		else
 			{

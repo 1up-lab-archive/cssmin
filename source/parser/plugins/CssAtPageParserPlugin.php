@@ -1,42 +1,37 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * {@link aCssParserPlugin Parser plugin} for parsing @page at-rule block with including declarations.
  * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
- * This {@link aCssParserPlugin parser plugin} is responsible for parsing the @page at-rule block and the 
- * containing declarations. It returns the {@link CssAtPageStartToken}, {@link CssAtPageDeclarationToken} and 
- * {@link CssAtPageEndToken} tokens.
- * --
+ * Found @page at-rule blocks will add a {@link CssAtPageStartToken} and {@link CssAtPageEndToken} to the 
+ * parser; including declarations as {@link CssAtPageDeclarationToken}.
  * 
  * @package		CssMin/Parser/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssAtPageParserPlugin extends aCssParserPlugin
 	{
 	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_CHARS}.
+	 * Implements {@link aCssParserPlugin::getTriggerChars()}.
 	 * 
-	 * @var string
+	 * @return array
 	 */
-	const TRIGGER_CHARS = "@{}:;";
+	public function getTriggerChars()
+		{
+		return array("@", "{", "}", ":", ";");
+		}
 	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_STATES}.
+	 * Implements {@link aCssParserPlugin::getTriggerStates()}.
 	 * 
-	 * @var string
+	 * @return array
 	 */
-	const TRIGGER_STATES = "T_DOCUMENT,T_AT_PAGE::SELECTOR,T_AT_PAGE,T_AT_PAGE_DECLARATION";
+	public function getTriggerStates()
+		{
+		return array("T_DOCUMENT", "T_AT_PAGE::SELECTOR", "T_AT_PAGE", "T_AT_PAGE_DECLARATION");
+		}
 	/**
 	 * Implements {@link aCssParserPlugin::parse()}.
 	 * 
@@ -76,7 +71,7 @@ class CssAtPageParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			trigger_error(new CssError("Unterminated @page declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
+			trigger_error(new CssError(__METHOD__ . ": Unterminated @page declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
 			}
 		// End of @page declaration
 		elseif (($char === ";" || $char === "}") && $state == "T_AT_PAGE_DECLARATION")

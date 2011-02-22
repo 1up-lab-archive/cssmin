@@ -1,47 +1,42 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * {@link aCssParserPlugin Parser plugin} for preserve parsing string values.
  * 
- * --
+ * This plugin return no {@link aCssToken CssToken} but ensures that string values will get parsed properly.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
- * This {@link aCssParserPlugin parser plugin} is responsible for parsing string. This plugin only makes sure strings
- * get parsed properly and will return no token. 
- * --
- *
  * @package		CssMin/Parser/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssStringParserPlugin extends aCssParserPlugin
 	{
 	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_CHARS}.
-	 * 
-	 * @var string
-	 */
-	const TRIGGER_CHARS = "\"'\n";
-	/**
-	 * Implements {@link aCssParserPlugin::TRIGGER_STATES}.
-	 * 
-	 * @var string
-	 */
-	const TRIGGER_STATES = false;
-	/**
-	 * --
+	 * Current string delimiter char.
 	 * 
 	 * @var string
 	 */
 	private $delimiterChar = null;
+	/**
+	 * Implements {@link aCssParserPlugin::getTriggerChars()}.
+	 * 
+	 * @return array
+	 */
+	public function getTriggerChars()
+		{
+		return array("\"", "'", "\n");
+		}
+	/**
+	 * Implements {@link aCssParserPlugin::getTriggerStates()}.
+	 * 
+	 * @return array
+	 */
+	public function getTriggerStates()
+		{
+		return false;
+		}
 	/**
 	 * Implements {@link aCssParserPlugin::parse()}.
 	 * 
@@ -71,7 +66,7 @@ class CssStringParserPlugin extends aCssParserPlugin
 			$this->parser->popState();
 			$this->parser->unsetExclusive();
 			$this->parser->setBuffer(substr($this->parser->getBuffer(), 0, -1) . $this->delimiterChar); // Replace the LF with the current string char
-			trigger_error(new CssError("Unterminated string literal", $line . "_"), E_USER_WARNING);
+			trigger_error(new CssError(__METHOD__ . ": Unterminated string literal", $line . "_"), E_USER_WARNING);
 			$this->delimiterChar = null;
 			}
 		// End of string

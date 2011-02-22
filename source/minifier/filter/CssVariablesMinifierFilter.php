@@ -1,27 +1,15 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
- * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
  * This {@link aCssMinifierFilter minifier filter} will parse the variable declarations out of @variables at-rule 
  * blocks. The variables will get store in the {@link CssVariablesMinifierPlugin} that will apply the variables to 
  * declaration.
- * --
  * 
  * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssVariablesMinifierFilter extends aCssMinifierFilter
 	{
@@ -79,7 +67,7 @@ class CssVariablesMinifierFilter extends aCssMinifierFilter
 			}
 		if (!($plugin = $this->minifier->getPlugin("CssVariablesMinifierPlugin")))
 			{
-			trigger_error(new CssError("The plugin <code>CssVariablesMinifierPlugin</code> was not found but is required for <code>" . __CLASS__ . "</code>"), E_USER_WARNING);
+			trigger_error(new CssError(__METHOD__ . ": The plugin <code>CssVariablesMinifierPlugin</code> was not found but is required for <code>" . __CLASS__ . "</code>"), E_USER_WARNING);
 			}
 		else
 			{

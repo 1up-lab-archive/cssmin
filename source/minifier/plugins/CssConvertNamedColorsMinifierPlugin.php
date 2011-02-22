@@ -1,37 +1,25 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * This {@link aCssMinifierPlugin} will convert named color values to hexadecimal notation.
  * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
- * This {@link aCssMinifierPlugin} will convert named color values to hexadecimal notation. Example:
- * 
+ * Example:
  * <code>
  * color: black;
  * border: 1px solid indigo;
  * </code>
  * 
  * Will get converted to:
- * 
  * <code>
  * color:#000;
  * border:1px solid #4b0082;
  * </code>
- * --
  * 
  * @package		CssMin/Minifier/Plugins
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssConvertNamedColorsMinifierPlugin extends aCssMinifierPlugin
 	{

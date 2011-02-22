@@ -1,47 +1,51 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * Abstract formatter definition.
  * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
+ * Every formatter have to extend this class.
  * 
  * @package		CssMin/Formatter
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 abstract class aCssFormatter
 	{
-	protected $ident = "    ";
+	/**
+	 * Indent string.
+	 * 
+	 * @var string
+	 */
+	protected $indent = "    ";
+	/**
+	 * Declaration padding.
+	 * 
+	 * @var integer
+	 */
 	protected $padding = 0;
 	/**
-	 * --
+	 * Tokens.
 	 * 
 	 * @var array
 	 */
 	protected $tokens = array();
 	/**
-	 * --
+	 * Constructor.
 	 * 
-	 * @param array $tokens
-	 * @return void
+	 * @param array $tokens Array of CssToken
+	 * @param string $indent Indent string [optional]
+	 * @param integer $padding Declaration value padding [optional]
 	 */
 	public function __construct(array $tokens, $indent = null, $padding = null)
 		{
 		$this->tokens	= $tokens;
-		$this->indent	= !is_null($indent) ? $indent : "    ";
-		$this->padding	= !is_null($padding) ? $padding : 0;
+		$this->indent	= !is_null($indent) ? $indent : $this->indent;
+		$this->padding	= !is_null($padding) ? $padding : $this->padding;
 		}
 	/**
-	 * --
+	 * Returns the array of aCssToken as formatted string.
 	 * 
 	 * @return string
 	 */

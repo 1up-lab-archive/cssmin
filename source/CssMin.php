@@ -3,12 +3,25 @@
  * CssMin - A (simple) css minifier with benefits
  * 
  * --
+ * Copyright (c) 2011 Joe Scylla <joe.scylla@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  * --
  * 
  * @package		CssMin
@@ -16,7 +29,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssMin
 	{
@@ -25,7 +38,7 @@ class CssMin
 	 * 
 	 * The php source get minifed by using the php function {@link http://goo.gl/eIcoH php_strip_whitespace()}.
 	 * 
-	 * @param string $target Path includign file name were the build version should be saved [optional]
+	 * @param string $target Path including file name were the build version should be saved [optional]
 	 * @return string Minifed build version
 	 */
 	public static function build($target = "")
@@ -82,7 +95,7 @@ class CssMin
 	 * @link http://goo.gl/JrW54 Autoload} function of CssMin.
 	 * 
 	 * @param string $class Name of the class
-	 * @return boolean 
+	 * @return boolean TRUE if the class was found and loaded; FALSE is the class was not found
 	 */
 	public static function autoload($class)
 		{
@@ -125,11 +138,13 @@ class CssMin
 	 * Minifies CSS source.
 	 * 
 	 * @param string $source CSS source
+	 * @param array $filters Filter configuration [optional]
+	 * @param array $plugins Plugin configuration [optional]
 	 * @return string Minified CSS
 	 */
-	public static function minify($source)
+	public static function minify($source, array $filters = null, array $plugins = null)
 		{
-		$minifier = new CssMinifier($source);
+		$minifier = new CssMinifier($source, $filters, $plugins);
 		return $minifier->getMinified();
 		}
 	/**

@@ -1,26 +1,13 @@
 <?php
 /**
- * CssMin - A (simple) css minifier with benefits
+ * CSS Parser.
  * 
- * --
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * --
- * 
- 
- *  
- * --
- *
  * @package		CssMin/Parser
  * @link		http://code.google.com/p/cssmin/
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.0.b1
  */
 class CssParser
 	{
@@ -35,20 +22,7 @@ class CssParser
 	 * 
 	 * @var array
 	 */
-	private $plugins = array
-		(
-		"CssCommentParserPlugin",
-		"CssStringParserPlugin",
-		"CssUrlParserPlugin",
-		"CssExpressionParserPlugin",
-		"CssRulesetParserPlugin",
-		"CssAtCharsetParserPlugin",
-		"CssAtFontFaceParserPlugin",
-		"CssAtImportParserPlugin",
-		"CssAtMediaParserPlugin",
-		"CssAtPageParserPlugin",
-		"CssAtVariablesParserPlugin"
-		);
+	private $plugins = array();
 	/**
 	 * Source to parse.
 	 * 
@@ -90,14 +64,41 @@ class CssParser
 	 * 
 	 *  Create instances of the used {@link aCssParserPlugin plugins}.
 	 * 
-	 * @param string $source CSS source
+	 * @param string $source CSS source [optional]
+	 * @param array $plugins Plugin configuration [optional]
 	 * @return void
 	 */
-	public function __construct($source = null)
+	public function __construct($source = null, array $plugins = null)
 		{
-		foreach ($this->plugins as $i => $plugin)
+		$plugins = array_merge(array
+			(
+			"Comment"		=> true,
+			"String"		=> true,
+			"Url"			=> true,
+			"Expression"	=> true,
+			"Ruleset"		=> true,
+			"AtCharset"		=> true,
+			"AtFontFace"	=> true,
+			"AtImport"		=> true,
+			"AtMedia"		=> true,
+			"AtPage"		=> true,
+			"AtVariables"	=> true
+			), is_array($plugins) ? $plugins : array());
+		foreach ($plugins as $name => $config)
 			{
-			$this->plugins[$i] = new $plugin($this);
+			if ($config !== false)
+				{
+				$class	= "Css" . $name . "ParserPlugin";
+				$config = is_array($config) ? $config : array();
+				if (class_exists($class))
+					{
+					$this->plugins[] = new $class($this, $config);
+					}
+				else
+					{
+					trigger_error(new CssError(__METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
+					}
+				}
 			}
 		if (!is_null($source))
 			{
@@ -243,9 +244,9 @@ class CssParser
 		for ($i = 0, $l = count($plugins); $i < $l; $i++)
 			{
 			$tPluginClassName				= get_class($plugins[$i]);
-			$pluginTriggerChars[$i]			= constant($tPluginClassName . "::TRIGGER_CHARS");
-			$tPluginTriggerStates			= constant($tPluginClassName . "::TRIGGER_STATES");
-			$pluginTriggerStates[$i]		= $tPluginTriggerStates === false ? false : "|" . str_replace(",", "|", $tPluginTriggerStates) . "|";
+			$pluginTriggerChars[$i]			= implode("", $plugins[$i]->getTriggerChars());
+			$tPluginTriggerStates			= $plugins[$i]->getTriggerStates();
+			$pluginTriggerStates[$i]		= $tPluginTriggerStates === false ? false : "|" . implode("|", $tPluginTriggerStates) . "|";
 			$pluginIndex[$tPluginClassName]	= $i;
 			for ($ii = 0, $ll = strlen($pluginTriggerChars[$i]); $ii < $ll; $ii++)
 				{
