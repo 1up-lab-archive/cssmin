@@ -7,7 +7,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0.b1
+ * @version		3.0.0
  */
 class CssMinifier
 	{
@@ -34,7 +34,7 @@ class CssMinifier
 	 * 
 	 * Creates instances of {@link aCssMinifierFilter filters} and {@link aCssMinifierPlugin plugins}.
 	 * 
-	 * @param string $source CSS source
+	 * @param string $source CSS source [optional]
 	 * @param array $filters Filter configuration [optional]
 	 * @param array $plugins Plugin configuration [optional]
 	 * @return void
@@ -47,9 +47,9 @@ class CssMinifier
 			"RemoveComments"				=> true, 
 			"RemoveEmptyRulesets"			=> true,
 			"RemoveEmptyAtBlocks"			=> true,
-			"RemoveLastDelarationSemiColon"	=> true,
 			"ConvertLevel3Properties"		=> false,
-			"Variables"						=> true
+			"Variables"						=> true,
+			"RemoveLastDelarationSemiColon"	=> true
 			), is_array($filters) ? $filters : array());
 		$plugins = array_merge(array
 			(
@@ -79,6 +79,7 @@ class CssMinifier
 					}
 				}
 			}
+		// Plugins
 		foreach ($plugins as $name => $config)
 			{
 			if ($config !== false)

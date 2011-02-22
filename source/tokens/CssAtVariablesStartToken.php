@@ -7,7 +7,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0.b1
+ * @version		3.0.0
  */
 class CssAtVariablesStartToken extends aCssNullToken
 	{
