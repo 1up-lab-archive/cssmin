@@ -23,11 +23,12 @@ class CssRemoveEmptyRulesetsMinifierFilter extends aCssMinifierFilter
 		for ($i = 0, $l = count($tokens); $i < $l; $i++)
 			{
 			$current	= get_class($tokens[$i]);
-			$next		= isset($tokens[$i+1]) ? get_class($tokens[$i+1]) : false;
+			$next		= isset($tokens[$i + 1]) ? get_class($tokens[$i + 1]) : false;
 			if ($current === "CssRulesetStartToken" && $next === "CssRulesetEndToken")
 				{
 				$tokens[$i]		= null;
 				$tokens[$i + 1]	= null;
+				$i++;
 				$r = $r + 2;
 				}
 			}
