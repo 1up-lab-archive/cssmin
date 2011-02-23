@@ -45,5 +45,9 @@ abstract class aCssMinifierPlugin
 	 * @return boolean Return TRUE to break the processing of this token; FALSE to continue
 	 */
 	abstract public function apply(aCssToken &$token);
+	/**
+	 * 
+	 */
+	abstract public function getTriggerTokens();
 	}
 ?>

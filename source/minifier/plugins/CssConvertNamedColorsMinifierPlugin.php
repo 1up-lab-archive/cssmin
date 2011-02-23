@@ -187,12 +187,13 @@ class CssConvertNamedColorsMinifierPlugin extends aCssMinifierPlugin
 	 * based on the {@link CssConvertNamedColorsMinifierPlugin::$transformation transformation table}.
 	 * 
 	 * @param CssMinifier $minifier The CssMinifier object of this plugin.
+	 * @param array $configuration Plugin configuration [optional]
 	 * @return void
 	 */
-	public function __construct(CssMinifier $minifier)
+	public function __construct(CssMinifier $minifier, array $configuration = array())
 		{
 		$this->reMatch = "/(^|\s)+(" . implode("|", array_keys($this->transformation)) . ")(\s|$)+/eiS";
-		parent::__construct($minifier);
+		parent::__construct($minifier, $configuration);
 		}
 	/**
 	 * Implements {@link aCssMinifierPlugin::minify()}.
@@ -202,21 +203,32 @@ class CssConvertNamedColorsMinifierPlugin extends aCssMinifierPlugin
 	 */
 	public function apply(aCssToken &$token)
 		{
-		if (get_class($token) === "CssRulesetDeclarationToken")
+		$lcValue = strtolower($token->Value);
+		// Declaration value equals a value in the transformation table => simple replace
+		if (isset($this->transformation[$lcValue]))
 			{
-			$lcValue = strtolower($token->Value);
-			// Declaration value equals a value in the transformation table => simple replace
-			if (isset($this->transformation[$lcValue]))
-				{
-				$token->Value = $this->transformation[$lcValue];
-				}
-			// Declaration value contains a value in the transformation table => regular expression replace
-			elseif (preg_match($this->reMatch, $token->Value))
-				{
-				$token->Value = preg_replace($this->reMatch, $this->reReplace, $token->Value);
-				}
+			$token->Value = $this->transformation[$lcValue];
+			}
+		// Declaration value contains a value in the transformation table => regular expression replace
+		elseif (preg_match($this->reMatch, $token->Value))
+			{
+			$token->Value = preg_replace($this->reMatch, $this->reReplace, $token->Value);
 			}
 		return false;
+		}
+	/**
+	 * Implements {@link aMinifierPlugin::getTriggerTokens()}
+	 * 
+	 * @return array
+	 */
+	public function getTriggerTokens()
+		{
+		return array
+			(
+			"CssAtFontFaceDeclarationToken",
+			"CssAtPageDeclarationToken",
+			"CssRulesetDeclarationToken"
+			);
 		}
 	}
 ?>

@@ -52,7 +52,7 @@ class CssCompressUnitValuesMinifierPlugin extends aCssMinifierPlugin
 	 */
 	public function apply(aCssToken &$token)
 		{
-		if (get_class($token) === "CssRulesetDeclarationToken" && preg_match($this->reMatch, $token->Value))
+		if (preg_match($this->reMatch, $token->Value))
 			{
 			foreach ($this->re as $reMatch => $reReplace)
 				{
@@ -60,6 +60,20 @@ class CssCompressUnitValuesMinifierPlugin extends aCssMinifierPlugin
 				}
 			}
 		return false;
+		}
+	/**
+	 * Implements {@link aMinifierPlugin::getTriggerTokens()}
+	 * 
+	 * @return array
+	 */
+	public function getTriggerTokens()
+		{
+		return array
+			(
+			"CssAtFontFaceDeclarationToken",
+			"CssAtPageDeclarationToken",
+			"CssRulesetDeclarationToken"
+			);
 		}
 	}
 ?>

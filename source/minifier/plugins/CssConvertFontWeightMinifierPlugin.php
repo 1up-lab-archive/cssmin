@@ -78,14 +78,25 @@ class CssConvertFontWeightMinifierPlugin extends aCssMinifierPlugin
 	 */
 	public function apply(aCssToken &$token)
 		{
-		if (get_class($token) === "CssRulesetDeclarationToken")
+		if (in_array($token->Property, $this->include) && preg_match($this->reMatch, $token->Value, $m))
 			{
-			if (in_array($token->Property, $this->include) && preg_match($this->reMatch, $token->Value, $m))
-				{
-				$token->Value = preg_replace($this->reMatch, $this->reReplace, $token->Value);
-				}
+			$token->Value = preg_replace($this->reMatch, $this->reReplace, $token->Value);
 			}
 		return false;
+		}
+	/**
+	 * Implements {@link aMinifierPlugin::getTriggerTokens()}
+	 * 
+	 * @return array
+	 */
+	public function getTriggerTokens()
+		{
+		return array
+			(
+			"CssAtFontFaceDeclarationToken",
+			"CssAtPageDeclarationToken",
+			"CssRulesetDeclarationToken"
+			);
 		}
 	}
 ?>

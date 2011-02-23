@@ -57,7 +57,7 @@ class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 	 */
 	public function apply(aCssToken &$token)
 		{
-		if (get_class($token) === "CssRulesetDeclarationToken" && stripos($token->Value, "var") !== false && preg_match($this->reMatch, $token->Value, $m))
+		if (stripos($token->Value, "var") !== false && preg_match($this->reMatch, $token->Value, $m))
 			{
 			$variable	= trim($m[1]);
 			$mediaTypes	= $token->MediaTypes;
@@ -79,6 +79,20 @@ class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 			$token = new CssNullToken();
 			}
 		return false;
+		}
+	/**
+	 * Implements {@link aMinifierPlugin::getTriggerTokens()}
+	 * 
+	 * @return array
+	 */
+	public function getTriggerTokens()
+		{
+		return array
+			(
+			"CssAtFontFaceDeclarationToken",
+			"CssAtPageDeclarationToken",
+			"CssRulesetDeclarationToken"
+			);
 		}
 	/**
 	 * Sets the variables.

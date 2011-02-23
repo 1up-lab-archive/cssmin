@@ -35,11 +35,25 @@ class CssConvertHslColorsMinifierPlugin extends aCssMinifierPlugin
 	 */
 	public function apply(aCssToken &$token)
 		{
-		if (get_class($token) === "CssRulesetDeclarationToken" && stripos($token->Value, "hsl") !== false && preg_match($this->reMatch, $token->Value, $m))
+		if (stripos($token->Value, "hsl") !== false && preg_match($this->reMatch, $token->Value, $m))
 			{
 			$token->Value = str_replace($m[0], $this->hsl2hex($m[1], $m[2], $m[3]), $token->Value);
 			}
 		return false;
+		}
+	/**
+	 * Implements {@link aMinifierPlugin::getTriggerTokens()}
+	 * 
+	 * @return array
+	 */
+	public function getTriggerTokens()
+		{
+		return array
+			(
+			"CssAtFontFaceDeclarationToken",
+			"CssAtPageDeclarationToken",
+			"CssRulesetDeclarationToken"
+			);
 		}
 	/**
 	 * Convert a HSL value to hexadecimal notation.

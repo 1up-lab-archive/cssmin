@@ -22,7 +22,7 @@ class CssCompressExpressionValuesMinifierPlugin extends aCssMinifierPlugin
 	 */
 	public function apply(aCssToken &$token)
 		{
-		if (class_exists("JSMin") && get_class($token) === "CssRulesetDeclarationToken" && stripos($token->Value, "expression(") !== false)
+		if (class_exists("JSMin") && stripos($token->Value, "expression(") !== false)
 			{
 			$value	= $token->Value;
 			$value	= substr($token->Value, stripos($token->Value, "expression(") + 10);
@@ -30,6 +30,20 @@ class CssCompressExpressionValuesMinifierPlugin extends aCssMinifierPlugin
 			$token->Value = "expression(" . $value . ")";
 			}
 		return false;
+		}
+	/**
+	 * Implements {@link aMinifierPlugin::getTriggerTokens()}
+	 * 
+	 * @return array
+	 */
+	public function getTriggerTokens()
+		{
+		return array
+			(
+			"CssAtFontFaceDeclarationToken",
+			"CssAtPageDeclarationToken",
+			"CssRulesetDeclarationToken"
+			);
 		}
 	}
 ?>

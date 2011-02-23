@@ -34,6 +34,12 @@
 class CssMin
 	{
 	/**
+	 * Index of classes
+	 * 
+	 * @var array
+	 */
+	private static $classIndex = array();
+	/**
 	 * Create a build version of CssMin.
 	 * 
 	 * The php source get minifed by using the php function {@link http://goo.gl/eIcoH php_strip_whitespace()}.
@@ -71,20 +77,10 @@ class CssMin
 				}
 			$source .= file_get_contents($file);
 			}
-		// Remove the initialisation call and php delimiters
-		$source	= str_replace("CssMin::initialise();\n", "", $source);
+		// Remove php delimiters
 		$source	= str_replace(array("<?php", "?>"), "", $source);
-		// Create a temporary file of the source and call php_strip_whitespace to get the minified source
-		$source	= "<?php" . $source . "?>";
-		$tmp	= tempnam(sys_get_temp_dir(), "CssMin");
-		if (file_put_contents($tmp, $source) === false)
-			{
-			return false;
-			}
-		$source = php_strip_whitespace($tmp);
-		unlink($tmp);
-		// Add the main comment and save the file
-		$source = str_replace("<?php", "<?php\n" . $comment, $source);
+		// Add php delimiters and the main comment and save the file
+		$source = "<?php\n" . $comment . $source . "?>";
 		if ($target && file_put_contents($target, $source) === false)
 			{
 			return false;
@@ -95,35 +91,14 @@ class CssMin
 	 * @link http://goo.gl/JrW54 Autoload} function of CssMin.
 	 * 
 	 * @param string $class Name of the class
-	 * @return boolean TRUE if the class was found and loaded; FALSE is the class was not found
+	 * @return void
 	 */
 	public static function autoload($class)
 		{
-		static $index = null;
-		// Create the class index for autoloading
-		if (is_null($index))
+		if (isset(self::$classIndex[$class]))
 			{
-			$index = array();
-			$paths = array(dirname(__FILE__));
-			while (list($i, $path) = each($paths))
-				{
-				foreach (glob($path . "*", GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT) as $subDirectory)
-					{
-					$paths[] = $subDirectory;
-					}
-				foreach (glob($path . "*.php", 0) as $file)
-					{
-					$class = substr(basename($file), 0, -4);
-					$index[$class] = $file;
-					}
-				}
+			require(self::$classIndex[$class]);
 			}
-		if (isset($index[$class]))
-			{
-			require($index[$class]);
-			return true;
-			}
-		return false;
 		}
 	/**
 	 * Initialises CssMin.
@@ -132,7 +107,37 @@ class CssMin
 	 */
 	public static function initialise()
 		{
-		spl_autoload_register(array(__CLASS__, "autoload"));
+		// Create the class index for autoloading or including
+		$paths = array(dirname(__FILE__));
+		while (list($i, $path) = each($paths))
+			{
+			foreach (glob($path . "*", GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT) as $subDirectory)
+				{
+				$paths[] = $subDirectory;
+				}
+			foreach (glob($path . "*.php", 0) as $file)
+				{
+				$class = substr(basename($file), 0, -4);
+				self::$classIndex[$class] = $file;
+				}
+			}
+		krsort(self::$classIndex);
+		// Only use autoloading if spl_autoload_register() is available and no __autoload() is defined
+		if (function_exists("spl_autoload_register") && !is_callable("__autoload"))
+			{
+			spl_autoload_register(array(__CLASS__, "autoload"));
+			}
+		// Otherwise include all class files
+		else
+			{
+			foreach (self::$classIndex as $class => $file)
+				{
+				if (!class_exists($class))
+					{
+					require_once($file);
+					}
+				}
+			}
 		}
 	/**
 	 * Minifies CSS source.

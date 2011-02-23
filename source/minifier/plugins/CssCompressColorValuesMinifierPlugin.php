@@ -36,7 +36,7 @@ class CssCompressColorValuesMinifierPlugin extends aCssMinifierPlugin
 	 */
 	public function apply(aCssToken &$token)
 		{
-		if (get_class($token) === "CssRulesetDeclarationToken" && strpos($token->Value, "#") !== false && preg_match($this->reMatch, $token->Value, $m))
+		if (strpos($token->Value, "#") !== false && preg_match($this->reMatch, $token->Value, $m))
 			{
 			$value = strtolower($m[1]);
 			if ($value[0] == $value[1] && $value[2] == $value[3] && $value[4] == $value[5])
@@ -45,6 +45,20 @@ class CssCompressColorValuesMinifierPlugin extends aCssMinifierPlugin
 				}
 			}
 		return false;
+		}
+	/**
+	 * Implements {@link aMinifierPlugin::getTriggerTokens()}
+	 * 
+	 * @return array
+	 */
+	public function getTriggerTokens()
+		{
+		return array
+			(
+			"CssAtFontFaceDeclarationToken",
+			"CssAtPageDeclarationToken",
+			"CssRulesetDeclarationToken"
+			);
 		}
 	}
 ?>

@@ -303,11 +303,11 @@ class CssParser
 				// Else iterate through the plugins
 				else
 					{
-					$tState = "|" . $state . "|";
+					$triggerState = "|" . $state . "|";
 					for ($ii = 0, $ll = $pluginCount; $ii < $ll; $ii++)
 						{
 						// Only process if the current char is one of the plugin trigger chars
-						if (strpos($pluginTriggerChars[$ii], $c) !== false && ($pluginTriggerStates[$ii] === false || strpos($pluginTriggerStates[$ii], $tState) !== false))
+						if (strpos($pluginTriggerChars[$ii], $c) !== false && ($pluginTriggerStates[$ii] === false || strpos($pluginTriggerStates[$ii], $triggerState) !== false))
 							{
 							// Process with the plugin
 							$r = $plugins[$ii]->parse($i, $c, $p, $state);

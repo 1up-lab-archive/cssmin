@@ -57,10 +57,10 @@ class CssMinifier
 			"ConvertFontWeight"				=> false,
 			"ConvertHslColors"				=> false,
 			"ConvertRgbColors"				=> false,
-			"ConvertNamedColors"			=> true,
-			"CompressColorValues"			=> true,
-			"CompressUnitValues"			=> true,
-			"CompressExpressionValues"		=> true
+			"ConvertNamedColors"			=> false,
+			"CompressColorValues"			=> false,
+			"CompressUnitValues"			=> false,
+			"CompressExpressionValues"		=> false
 			), is_array($plugins) ? $plugins : array());
 		// Filters
 		foreach ($filters as $name => $config)
@@ -139,14 +139,34 @@ class CssMinifier
 	public function minify($source)
 		{
 		// Variables
-		$r				= "";
-		$parser			= new CssParser($source);
-		$tokens			= $parser->getTokens();
-		$filters 		= $this->filters;
-		$filterCount	= count($this->filters);
-		$plugins		= $this->plugins;
-		$pluginCount	= count($this->plugins);
-		// Apply filters
+		$r						= "";
+		$parser					= new CssParser($source);
+		$tokens					= $parser->getTokens();
+		$filters 				= $this->filters;
+		$filterCount			= count($this->filters);
+		$plugins				= $this->plugins;
+		$pluginCount			= count($plugins);
+		$pluginIndex			= array();
+		$pluginTriggerTokens	= array();
+		$globalTriggerTokens	= array();
+		for ($i = 0, $l = count($plugins); $i < $l; $i++)
+			{
+			$tPluginClassName				= get_class($plugins[$i]);
+			$pluginTriggerTokens[$i]		= $plugins[$i]->getTriggerTokens();
+			foreach ($pluginTriggerTokens[$i] as $v)
+				{
+				if (!in_array($v, $globalTriggerTokens))
+					{
+					$globalTriggerTokens[] = $v;
+					}
+				}
+			$pluginTriggerTokens[$i] = "|" . implode("|", $pluginTriggerTokens[$i]) . "|";
+			$pluginIndex[$tPluginClassName]	= $i;
+			}
+		$globalTriggerTokens = "|" . implode("|", $globalTriggerTokens) . "|";
+		/*
+		 * Apply filters
+		 */
 		for($i = 0; $i < $filterCount; $i++)
 			{
 			// Apply the filter; if the return value is larger than 0...
@@ -156,16 +176,25 @@ class CssMinifier
 				$tokens = array_values(array_filter($tokens));
 				}
 			}
-		$tokenCount		= count($tokens);
-		// Apply plugins to the tokens
+		$tokenCount = count($tokens);
+		/*
+		 * Apply plugins
+		 */
 		for($i = 0; $i < $tokenCount; $i++)
 			{
-			for($ii = 0; $ii < $pluginCount; $ii++)
+			$triggerToken = "|" . get_class($tokens[$i]) . "|";
+			if (strpos($globalTriggerTokens, $triggerToken) !== false)
 				{
-				// Apply the plugin; if the return value is TRUE continue to the next token
-				if ($plugins[$ii]->apply($tokens[$i]) === true)
+				for($ii = 0; $ii < $pluginCount; $ii++)
 					{
-					continue;
+					if (strpos($pluginTriggerTokens[$ii], $triggerToken) !== false || $pluginTriggerTokens[$ii] === false)
+						{
+						// Apply the plugin; if the return value is TRUE continue to the next token
+						if ($plugins[$ii]->apply($tokens[$i]) === true)
+							{
+							continue;
+							}
+						}
 					}
 				}
 			}
