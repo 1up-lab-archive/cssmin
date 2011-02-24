@@ -122,7 +122,8 @@ class CssMin
 				}
 			}
 		krsort(self::$classIndex);
-		// Only use autoloading if spl_autoload_register() is available and no __autoload() is defined
+		// Only use autoloading if spl_autoload_register() is available and no __autoload() is defined (because 
+		// __autoload() breaks if spl_autoload_register() is used. 
 		if (function_exists("spl_autoload_register") && !is_callable("__autoload"))
 			{
 			spl_autoload_register(array(__CLASS__, "autoload"));
@@ -156,11 +157,12 @@ class CssMin
 	 * Parse the CSS source.
 	 * 
 	 * @param string $source CSS source
+	 * @param array $plugins Plugin configuration [optional]
 	 * @return array Array of aCssToken
 	 */
-	public static function parse($source)
+	public static function parse($source, array $plugins = null)
 		{
-		$parser = new CssParser($source);
+		$parser = new CssParser($source, $plugins);
 		return $parser->getTokens();
 		}
 	}

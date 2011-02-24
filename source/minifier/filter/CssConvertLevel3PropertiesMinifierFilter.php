@@ -161,8 +161,6 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 		"outline-bottom-right-radius"	=> array("-moz-outline-radius-bottomright", null, null, null),
 		"outline-top-left-radius"		=> array("-moz-outline-radius-topleft", null, null, null),
 		"outline-top-right-radius"		=> array("-moz-outline-radius-topright", null, null, null),
-		"overflow-x"					=> array(null, null, null, "-ms-overflow-x"),
-		"overflow-y"					=> array(null, null, null, "-ms-overflow-y"),
 		"padding-after"					=> array(null, "-webkit-padding-after", null, null),
 		"padding-before"				=> array(null, "-webkit-padding-before", null, null),
 		"padding-end"					=> array("-moz-padding-end", "-webkit-padding-end", null, null),
@@ -233,14 +231,13 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 	 */
 	public function apply(array &$tokens)
 		{
-		$transformations = &$this->transformations;
 		$r = 0;
+		$transformations = &$this->transformations;
 		for ($i = 0, $l = count($tokens); $i < $l; $i++)
 			{
 			if (get_class($tokens[$i]) === "CssRulesetDeclarationToken")
 				{
 				$tProperty = $tokens[$i]->Property;
-				
 				if (isset($transformations[$tProperty]))
 					{
 					$result = array();
@@ -277,7 +274,7 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 		}
 	/**
 	 * Transforms the Internet Explorer specific declaration property "filter" to Internet Explorer 8+ compatible 
-	 * declaratiopn property "-ms_filter". 
+	 * declaratiopn property "-ms-filter". 
 	 * 
 	 * @param aCssToken $token
 	 * @return array

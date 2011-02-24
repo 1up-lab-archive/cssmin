@@ -84,6 +84,7 @@ class CssParser
 			"AtPage"		=> true,
 			"AtVariables"	=> true
 			), is_array($plugins) ? $plugins : array());
+		// Create plugin instances
 		foreach ($plugins as $name => $config)
 			{
 			if ($config !== false)

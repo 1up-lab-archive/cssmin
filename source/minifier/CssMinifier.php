@@ -192,7 +192,7 @@ class CssMinifier
 						// Apply the plugin; if the return value is TRUE continue to the next token
 						if ($plugins[$ii]->apply($tokens[$i]) === true)
 							{
-							continue;
+							continue 2;
 							}
 						}
 					}

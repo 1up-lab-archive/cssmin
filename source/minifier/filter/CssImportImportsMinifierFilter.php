@@ -1,6 +1,7 @@
 <?php
 /**
- * --
+ * This {@link aCssMinifierFilter minifier filter} import external css files defined with the @import at-rule into the 
+ * current stylesheet. 
  * 
  * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
@@ -12,7 +13,7 @@
 class CssImportImportsMinifierFilter extends aCssMinifierFilter
 	{
 	/**
-	 * --
+	 * Array with already imported external stylesheets.
 	 * 
 	 * @var array
 	 */

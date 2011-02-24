@@ -57,26 +57,30 @@ class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 	 */
 	public function apply(aCssToken &$token)
 		{
-		if (stripos($token->Value, "var") !== false && preg_match($this->reMatch, $token->Value, $m))
+		if (stripos($token->Value, "var") !== false && preg_match_all($this->reMatch, $token->Value, $m))
 			{
-			$variable	= trim($m[1]);
 			$mediaTypes	= $token->MediaTypes;
 			if (!in_array("all", $mediaTypes))
 				{
 				$mediaTypes[] = "all";
 				}
-			foreach ($mediaTypes as $mediaType)
+			for ($i = 0, $l = count($m[0]); $i < $l; $i++)
 				{
-				if (isset($this->variables[$mediaType], $this->variables[$mediaType][$variable]))
+				$variable	= trim($m[1][$i]);
+				foreach ($mediaTypes as $mediaType)
 					{
-					// Variable value found => set the declaration value to the variable value and return
-					$token->Value = str_replace($m[0], $this->variables[$mediaType][$variable], $token->Value);
-					return false;
+					if (isset($this->variables[$mediaType], $this->variables[$mediaType][$variable]))
+						{
+						// Variable value found => set the declaration value to the variable value and return
+						$token->Value = str_replace($m[0][$i], $this->variables[$mediaType][$variable], $token->Value);
+						continue 2;
+						}
 					}
+				// If no value was found trigger an error and replace the token with a CssNullToken
+				trigger_error(new CssError(__METHOD__ . ": No value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token), E_USER_WARNING);
+				$token = new CssNullToken();
+				return true;
 				}
-			// If no value was found trigger an error and replace the token with a CssNullToken
-			trigger_error(new CssError(__METHOD__ . ": No value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token), E_USER_WARNING);
-			$token = new CssNullToken();
 			}
 		return false;
 		}

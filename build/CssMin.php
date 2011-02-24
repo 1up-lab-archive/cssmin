@@ -469,26 +469,30 @@ class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 	 */
 	public function apply(aCssToken &$token)
 		{
-		if (stripos($token->Value, "var") !== false && preg_match($this->reMatch, $token->Value, $m))
+		if (stripos($token->Value, "var") !== false && preg_match_all($this->reMatch, $token->Value, $m))
 			{
-			$variable	= trim($m[1]);
 			$mediaTypes	= $token->MediaTypes;
 			if (!in_array("all", $mediaTypes))
 				{
 				$mediaTypes[] = "all";
 				}
-			foreach ($mediaTypes as $mediaType)
+			for ($i = 0, $l = count($m[0]); $i < $l; $i++)
 				{
-				if (isset($this->variables[$mediaType], $this->variables[$mediaType][$variable]))
+				$variable	= trim($m[1][$i]);
+				foreach ($mediaTypes as $mediaType)
 					{
-					// Variable value found => set the declaration value to the variable value and return
-					$token->Value = str_replace($m[0], $this->variables[$mediaType][$variable], $token->Value);
-					return false;
+					if (isset($this->variables[$mediaType], $this->variables[$mediaType][$variable]))
+						{
+						// Variable value found => set the declaration value to the variable value and return
+						$token->Value = str_replace($m[0][$i], $this->variables[$mediaType][$variable], $token->Value);
+						continue 2;
+						}
 					}
+				// If no value was found trigger an error and replace the token with a CssNullToken
+				trigger_error(new CssError(__METHOD__ . ": No value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token), E_USER_WARNING);
+				$token = new CssNullToken();
+				return true;
 				}
-			// If no value was found trigger an error and replace the token with a CssNullToken
-			trigger_error(new CssError(__METHOD__ . ": No value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token), E_USER_WARNING);
-			$token = new CssNullToken();
 			}
 		return false;
 		}
@@ -1258,6 +1262,7 @@ class CssParser
 			"AtPage"		=> true,
 			"AtVariables"	=> true
 			), is_array($plugins) ? $plugins : array());
+		// Create plugin instances
 		foreach ($plugins as $name => $config)
 			{
 			if ($config !== false)
@@ -1884,7 +1889,7 @@ class CssMinifier
 						// Apply the plugin; if the return value is TRUE continue to the next token
 						if ($plugins[$ii]->apply($tokens[$i]) === true)
 							{
-							continue;
+							continue 2;
 							}
 						}
 					}
@@ -2023,7 +2028,8 @@ class CssMin
 				}
 			}
 		krsort(self::$classIndex);
-		// Only use autoloading if spl_autoload_register() is available and no __autoload() is defined
+		// Only use autoloading if spl_autoload_register() is available and no __autoload() is defined (because 
+		// __autoload() breaks if spl_autoload_register() is used. 
 		if (function_exists("spl_autoload_register") && !is_callable("__autoload"))
 			{
 			spl_autoload_register(array(__CLASS__, "autoload"));
@@ -2057,11 +2063,12 @@ class CssMin
 	 * Parse the CSS source.
 	 * 
 	 * @param string $source CSS source
+	 * @param array $plugins Plugin configuration [optional]
 	 * @return array Array of aCssToken
 	 */
-	public static function parse($source)
+	public static function parse($source, array $plugins = null)
 		{
-		$parser = new CssParser($source);
+		$parser = new CssParser($source, $plugins);
 		return $parser->getTokens();
 		}
 	}
@@ -2069,7 +2076,8 @@ class CssMin
 CssMin::initialise();
 
 /**
- * --
+ * This {@link aCssMinifierFilter minifier filter} import external css files defined with the @import at-rule into the 
+ * current stylesheet. 
  * 
  * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
@@ -2081,7 +2089,7 @@ CssMin::initialise();
 class CssImportImportsMinifierFilter extends aCssMinifierFilter
 	{
 	/**
-	 * --
+	 * Array with already imported external stylesheets.
 	 * 
 	 * @var array
 	 */
@@ -2865,8 +2873,6 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 		"outline-bottom-right-radius"	=> array("-moz-outline-radius-bottomright", null, null, null),
 		"outline-top-left-radius"		=> array("-moz-outline-radius-topleft", null, null, null),
 		"outline-top-right-radius"		=> array("-moz-outline-radius-topright", null, null, null),
-		"overflow-x"					=> array(null, null, null, "-ms-overflow-x"),
-		"overflow-y"					=> array(null, null, null, "-ms-overflow-y"),
 		"padding-after"					=> array(null, "-webkit-padding-after", null, null),
 		"padding-before"				=> array(null, "-webkit-padding-before", null, null),
 		"padding-end"					=> array("-moz-padding-end", "-webkit-padding-end", null, null),
@@ -2937,14 +2943,13 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 	 */
 	public function apply(array &$tokens)
 		{
-		$transformations = &$this->transformations;
 		$r = 0;
+		$transformations = &$this->transformations;
 		for ($i = 0, $l = count($tokens); $i < $l; $i++)
 			{
 			if (get_class($tokens[$i]) === "CssRulesetDeclarationToken")
 				{
 				$tProperty = $tokens[$i]->Property;
-				
 				if (isset($transformations[$tProperty]))
 					{
 					$result = array();
@@ -2981,7 +2986,7 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 		}
 	/**
 	 * Transforms the Internet Explorer specific declaration property "filter" to Internet Explorer 8+ compatible 
-	 * declaratiopn property "-ms_filter". 
+	 * declaratiopn property "-ms-filter". 
 	 * 
 	 * @param aCssToken $token
 	 * @return array
