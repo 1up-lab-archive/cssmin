@@ -1,6 +1,7 @@
 <?php
 /**
- * This {@link aCssMinifierFilter minifier filter} will remove any empty rulesets.
+ * This {@link aCssMinifierFilter minifier filter} will remove any empty rulesets (including @keyframes at-rule block 
+ * rulesets).
  *
  * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
@@ -24,7 +25,9 @@ class CssRemoveEmptyRulesetsMinifierFilter extends aCssMinifierFilter
 			{
 			$current	= get_class($tokens[$i]);
 			$next		= isset($tokens[$i + 1]) ? get_class($tokens[$i + 1]) : false;
-			if ($current === "CssRulesetStartToken" && $next === "CssRulesetEndToken")
+			if (($current === "CssRulesetStartToken" && $next === "CssRulesetEndToken") ||
+				($current === "CssAtKeyframesRulesetStartToken" && $next === "CssAtKeyframesRulesetEndToken")
+				)
 				{
 				$tokens[$i]		= null;
 				$tokens[$i + 1]	= null;

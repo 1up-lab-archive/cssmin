@@ -214,7 +214,9 @@ abstract class aCssMinifierPlugin
 	 */
 	abstract public function apply(aCssToken &$token);
 	/**
+	 * --
 	 * 
+	 * @return array
 	 */
 	abstract public function getTriggerTokens();
 	}
@@ -368,6 +370,12 @@ class CssWhitesmithsFormatter extends aCssFormatter
 				{
 				$r[] = $indent . "@import " . $token->Import . " " . implode(", ", $token->MediaTypes) . ";";
 				}
+			elseif ($class === "CssAtKeyframesStartToken")
+				{
+				$r[] = $indent . "@keyframes \"" . $token->Name . "\"";
+				$r[] = $this->indent . $indent . "{";
+				$level++;
+				}
 			elseif ($class === "CssAtMediaStartToken")
 				{
 				$r[] = $indent . "@media " . implode(", ", $token->MediaTypes);
@@ -386,13 +394,18 @@ class CssWhitesmithsFormatter extends aCssFormatter
 				$r[] = $this->indent . $indent . "{";
 				$level++;
 				}
-			elseif ($class === "CssRulesetStartToken")
+			elseif ($class === "CssRulesetStartToken" || $class === "CssAtKeyframesRulesetStartToken")
 				{
 				$r[] = $indent . implode(", ", $token->Selectors);
 				$r[] = $this->indent . $indent . "{";
 				$level++;
 				}
-			elseif ($class == "CssAtFontFaceDeclarationToken" || $class === "CssAtPageDeclarationToken" || $class == "CssAtVariablesDeclarationToken" || $class === "CssRulesetDeclarationToken")
+			elseif ($class == "CssAtFontFaceDeclarationToken"
+				|| $class === "CssAtKeyframesRulesetDeclarationToken"
+				|| $class === "CssAtPageDeclarationToken"
+				|| $class == "CssAtVariablesDeclarationToken"
+				|| $class === "CssRulesetDeclarationToken"
+				)
 				{
 				$declaration = $indent . $token->Property . ": ";
 				if ($this->padding)
@@ -401,7 +414,14 @@ class CssWhitesmithsFormatter extends aCssFormatter
 					}
 				$r[] = $declaration . $token->Value . ($token->IsImportant ? " !important" : "") . ";";
 				}
-			elseif ($class === "CssAtMediaEndToken" || $class === "CssAtFontFaceEndToken" || $class === "CssAtPageEndToken" || $class == "CssAtVariablesEndToken" || $class === "CssRulesetEndToken")
+			elseif ($class === "CssAtFontFaceEndToken"
+				|| $class === "CssAtMediaEndToken"
+				|| $class === "CssAtKeyframesEndToken"
+				|| $class === "CssAtKeyframesRulesetEndToken"
+				|| $class === "CssAtPageEndToken"
+				|| $class === "CssAtVariablesEndToken"
+				|| $class === "CssRulesetEndToken"
+				)
 				{
 				$r[] = $indent . "}";
 				$level--;
@@ -734,7 +754,7 @@ class CssStringParserPlugin extends aCssParserPlugin
 		// Escaped LF in string => remove escape backslash and LF
 		elseif ($char === "\n" && $previousChar === "\\" && $state === "T_STRING")
 			{
-			$this->parser->setBuffer(substr($this->parser->getBuffer, 0, -2));
+			$this->parser->setBuffer(substr($this->parser->getBuffer(), 0, -2));
 			}
 		// Parse error: Unescaped LF in string literal
 		elseif ($char === "\n" && $previousChar !== "\\" && $state === "T_STRING")
@@ -1069,7 +1089,8 @@ class CssRemoveLastDelarationSemiColonMinifierFilter extends aCssMinifierFilter
 	}
 
 /**
- * This {@link aCssMinifierFilter minifier filter} will remove any empty rulesets.
+ * This {@link aCssMinifierFilter minifier filter} will remove any empty rulesets (including @keyframes at-rule block 
+ * rulesets).
  *
  * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
@@ -1093,7 +1114,9 @@ class CssRemoveEmptyRulesetsMinifierFilter extends aCssMinifierFilter
 			{
 			$current	= get_class($tokens[$i]);
 			$next		= isset($tokens[$i + 1]) ? get_class($tokens[$i + 1]) : false;
-			if ($current === "CssRulesetStartToken" && $next === "CssRulesetEndToken")
+			if (($current === "CssRulesetStartToken" && $next === "CssRulesetEndToken") ||
+				($current === "CssAtKeyframesRulesetStartToken" && $next === "CssAtKeyframesRulesetEndToken")
+				)
 				{
 				$tokens[$i]		= null;
 				$tokens[$i + 1]	= null;
@@ -1106,7 +1129,8 @@ class CssRemoveEmptyRulesetsMinifierFilter extends aCssMinifierFilter
 	}
 
 /**
- * This {@link aCssMinifierFilter minifier filter} will remove any empty @font-faxce, @media and @page at-rule blocks.
+ * This {@link aCssMinifierFilter minifier filter} will remove any empty @font-face, @keyframes, @media and @page 
+ * at-rule blocks.
  * 
  * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
@@ -1131,6 +1155,7 @@ class CssRemoveEmptyAtBlocksMinifierFilter extends aCssMinifierFilter
 			$current	= get_class($tokens[$i]);
 			$next		= isset($tokens[$i + 1]) ? get_class($tokens[$i + 1]) : false;
 			if (($current === "CssAtFontFaceStartToken" && $next === "CssAtFontFaceEndToken") ||
+				($current === "CssAtKeyframesStartToken" && $next === "CssAtKeyframesEndToken") ||
 				($current === "CssAtPageStartToken" && $next === "CssAtPageEndToken") ||
 				($current === "CssAtMediaStartToken" && $next === "CssAtMediaEndToken"))
 				{
@@ -1258,6 +1283,7 @@ class CssParser
 			"AtCharset"		=> true,
 			"AtFontFace"	=> true,
 			"AtImport"		=> true,
+			"AtKeyframes"	=> true,
 			"AtMedia"		=> true,
 			"AtPage"		=> true,
 			"AtVariables"	=> true
@@ -1642,6 +1668,11 @@ class CssOtbsFormatter extends aCssFormatter
 				{
 				$r[] = $indent . "@import " . $token->Import . " " . implode(", ", $token->MediaTypes) . ";";
 				}
+			elseif ($class === "CssAtKeyframesStartToken")
+				{
+				$r[] = $indent . "@keyframes \"" . $token->Name . "\" {";
+				$level++;
+				}
 			elseif ($class === "CssAtMediaStartToken")
 				{
 				$r[] = $indent . "@media " . implode(", ", $token->MediaTypes) . " {";
@@ -1657,12 +1688,17 @@ class CssOtbsFormatter extends aCssFormatter
 				$r[] = $indent . "@variables " . implode(", ", $token->MediaTypes) . " {";
 				$level++;
 				}
-			elseif ($class === "CssRulesetStartToken")
+			elseif ($class === "CssRulesetStartToken" || $class === "CssAtKeyframesRulesetStartToken")
 				{
 				$r[] = $indent . implode(", ", $token->Selectors) . " {";
 				$level++;
 				}
-			elseif ($class == "CssAtFontFaceDeclarationToken" || $class === "CssAtPageDeclarationToken" || $class == "CssAtVariablesDeclarationToken" || $class === "CssRulesetDeclarationToken")
+			elseif ($class == "CssAtFontFaceDeclarationToken"
+				|| $class === "CssAtKeyframesRulesetDeclarationToken"
+				|| $class === "CssAtPageDeclarationToken"
+				|| $class == "CssAtVariablesDeclarationToken"
+				|| $class === "CssRulesetDeclarationToken"
+				)
 				{
 				$declaration = $indent . $token->Property . ": ";
 				if ($this->padding)
@@ -1671,7 +1707,14 @@ class CssOtbsFormatter extends aCssFormatter
 					}
 				$r[] = $declaration . $token->Value . ($token->IsImportant ? " !important" : "") . ";";
 				}
-			elseif ($class === "CssAtMediaEndToken" || $class === "CssAtFontFaceEndToken" || $class === "CssAtPageEndToken" || $class == "CssAtVariablesEndToken" || $class === "CssRulesetEndToken")
+			elseif ($class === "CssAtFontFaceEndToken"
+				|| $class === "CssAtMediaEndToken"
+				|| $class === "CssAtKeyframesEndToken"
+				|| $class === "CssAtKeyframesRulesetEndToken"
+				|| $class === "CssAtPageEndToken"
+				|| $class === "CssAtVariablesEndToken"
+				|| $class === "CssRulesetEndToken"
+				)
 				{
 				$level--;
 				$r[] = str_repeat($indent, $level) . "}";
@@ -1745,6 +1788,7 @@ class CssMinifier
 			"RemoveEmptyRulesets"			=> true,
 			"RemoveEmptyAtBlocks"			=> true,
 			"ConvertLevel3Properties"		=> false,
+			"ConvertLevel3AtKeyframes"		=> false,
 			"Variables"						=> true,
 			"RemoveLastDelarationSemiColon"	=> true
 			), is_array($filters) ? $filters : array());
@@ -1946,9 +1990,20 @@ class CssMin
 	 */
 	private static $classIndex = array();
 	/**
-	 * Create a build version of CssMin.
+	 * @link http://goo.gl/JrW54 Autoload} function of CssMin.
 	 * 
-	 * The php source get minifed by using the php function {@link http://goo.gl/eIcoH php_strip_whitespace()}.
+	 * @param string $class Name of the class
+	 * @return void
+	 */
+	public static function autoload($class)
+		{
+		if (isset(self::$classIndex[$class]))
+			{
+			require(self::$classIndex[$class]);
+			}
+		}
+	/**
+	 * Create a build version of CssMin.
 	 * 
 	 * @param string $target Path including file name were the build version should be saved [optional]
 	 * @return string Minifed build version
@@ -1992,19 +2047,6 @@ class CssMin
 			return false;
 			}
 		return $source;
-		}
-	/**
-	 * @link http://goo.gl/JrW54 Autoload} function of CssMin.
-	 * 
-	 * @param string $class Name of the class
-	 * @return void
-	 */
-	public static function autoload($class)
-		{
-		if (isset(self::$classIndex[$class]))
-			{
-			require(self::$classIndex[$class]);
-			}
 		}
 	/**
 	 * Initialises CssMin.
@@ -3050,6 +3092,71 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 			{
 			return array();
 			}
+		}
+	}
+
+/**
+ * This {@link aCssMinifierFilter minifier filter} will convert @keyframes at-rule block to browser specific counterparts.
+ * 
+ * @package		CssMin/Minifier/Filters
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+class CssConvertLevel3AtKeyframesMinifierFilter extends aCssMinifierFilter
+	{
+	/**
+	 * Implements {@link aCssMinifierFilter::filter()}.
+	 * 
+	 * @param array $tokens Array of objects of type aCssToken
+	 * @return integer Count of added, changed or removed tokens; a return value large than 0 will rebuild the array
+	 */
+	public function apply(array &$tokens)
+		{
+		$r = 0;
+		$transformations = array("-webkit-keyframes");
+		for ($i = 0, $l = count($tokens); $i < $l; $i++)
+			{
+			if (get_class($tokens[$i]) === "CssAtKeyframesStartToken")
+				{
+				for ($ii = $i; $ii < $l; $ii++)
+					{
+					if (get_class($tokens[$ii]) === "CssAtKeyframesEndToken")
+						{
+						break;
+						}
+					}
+				if (get_class($tokens[$ii]) === "CssAtKeyframesEndToken")
+					{
+					$add	= array();
+					$source	= array();
+					for ($iii = $i; $iii <= $ii; $iii++)
+						{
+						$source[] = clone($tokens[$iii]);
+						}
+					foreach ($transformations as $transformation)
+						{
+						$t = $source;
+						$t[0]->AtRuleName = $transformation;
+						$add = array_merge($add, $t);
+						}
+					if (isset($this->configuration["RemoveSource"]) && $this->configuration["RemoveSource"] === true)
+						{
+						array_splice($tokens, $i, $ii - $i, $add);
+						}
+					else
+						{
+						array_splice($tokens, $ii + 1, 0, $add);
+						}
+					$l = count($tokens);
+					$i = $ii + count($add);
+					$r += count($add);
+					}
+				}
+			}
+		return $r;
 		}
 	}
 
@@ -4120,6 +4227,322 @@ class CssAtMediaParserPlugin extends aCssParserPlugin
  * @version		3.0.0
  */
 class CssAtMediaEndToken extends aCssRightCurlyBraceToken
+	{
+	
+	}
+
+/**
+ * This {@link aCssToken CSS token} represents the start of a @keyframes at-rule block.
+ *
+ * @package		CssMin/Tokens
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+class CssAtKeyframesStartToken extends aCssToken
+	{
+	/**
+	 * Name of the at-rule.
+	 * 
+	 * @var string
+	 */
+	public $AtRuleName = "keyframes";
+	/**
+	 * Name
+	 * 
+	 * @var string
+	 */
+	public $Name = "";
+	/**
+	 * Sets the properties of the @page at-rule.
+	 * 
+	 * @param string $selector Selector
+	 * @return void
+	 */
+	public function __construct($name)
+		{
+		$this->Name = $name;
+		}
+	/**
+	 * Implements {@link aCssToken::__toString()}.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+		{
+		return "@" . $this->AtRuleName . " \"" . $this->Name . "\"{";
+		}
+	}
+
+/**
+ * This {@link aCssToken CSS token} represents the start of a ruleset of a @keyframes at-rule block.
+ * 
+ * @package		CssMin/Tokens
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+class CssAtKeyframesRulesetStartToken extends aCssToken
+	{
+	/**
+	 * Array of selectors.
+	 * 
+	 * @var array
+	 */
+	public $Selectors = array();
+	/**
+	 * Set the properties of a ruleset token.
+	 * 
+	 * @param array $selectors Selectors of the ruleset 
+	 * @return void
+	 */
+	public function __construct(array $selectors = array())
+		{
+		$this->Selectors = $selectors;
+		}
+	/**
+	 * Implements {@link aCssToken::__toString()}.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+		{
+		return implode(",", $this->Selectors) . "{";
+		}
+	}
+
+/**
+ * This {@link aCssToken CSS token} represents the end of a ruleset of a @keyframes at-rule block.
+ * 
+ * @package		CssMin/Tokens
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+class CssAtKeyframesRulesetEndToken extends aCssRightCurlyBraceToken
+	{
+	
+	}
+
+/**
+ * This {@link aCssToken CSS token} represents a ruleset declaration of a @keyframes at-rule block.
+ *
+ * @package		CssMin/Tokens
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+class CssAtKeyframesRulesetDeclarationToken extends aCssToken
+	{
+	/**
+	 * Property name of the declaration.
+	 * 
+	 * @var string
+	 */
+	public $Property = "";
+	/**
+	 * Is the declaration flagged as important?
+	 * 
+	 * @var boolean
+	 */
+	public $IsImportant = false;
+	/**
+	 * Is the declaration flagged as last one of the ruleset?
+	 * 
+	 * @var boolean
+	 */
+	public $IsLast = false;
+	/**
+	 * Value of the declaration.
+	 * 
+	 * @var string
+	 */
+	public $Value = "";
+	/**
+	 * Set the properties of a ddocument- or at-rule @media level declaration. 
+	 * 
+	 * @param string $property Property of the declaration
+	 * @param string $value Value of the declaration
+	 * @param boolean $isImportant Is the !important flag is set
+	 * @param boolean $isLast Is the declaration the last one of the ruleset
+	 * @return void
+	 */
+	public function __construct($property, $value, $isImportant = false, $isLast = false)
+		{
+		$this->Property		= $property;
+		$this->Value		= $value;
+		$this->IsImportant	= $isImportant;
+		$this->IsLast		= $isLast;
+		}
+	/**
+	 * Implements {@link aCssToken::__toString()}.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+		{
+		return $this->Property . ":" . $this->Value . ($this->IsImportant ? " !important" : "") . ($this->IsLast ? "" : ";");
+		}
+	}
+
+/**
+ * {@link aCssParserPlugin Parser plugin} for parsing @keyframes at-rule blocks, rulesets and declarations.
+ * 
+ * @package		CssMin/Parser/Plugins
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+class CssAtKeyframesParserPlugin extends aCssParserPlugin
+	{
+	/**
+	 * Selectors.
+	 * 
+	 * @var array
+	 */
+	private $selectors = array();
+	/**
+	 * Implements {@link aCssParserPlugin::getTriggerChars()}.
+	 * 
+	 * @return array
+	 */
+	public function getTriggerChars()
+		{
+		return array("@", "{", "}", ":", ",", ";");
+		}
+	/**
+	 * Implements {@link aCssParserPlugin::getTriggerStates()}.
+	 * 
+	 * @return array
+	 */
+	public function getTriggerStates()
+		{
+		return array("T_DOCUMENT", "T_AT_KEYFRAMES::NAME", "T_AT_KEYFRAMES", "T_AT_KEYFRAMES_RULESETS", "T_AT_KEYFRAMES_RULESET", "T_AT_KEYFRAMES_RULESET_DECLARATION");
+		}
+	/**
+	 * Implements {@link aCssParserPlugin::parse()}.
+	 * 
+	 * @param integer $index Current index
+	 * @param string $char Current char
+	 * @param string $previousChar Previous char
+	 * @return mixed TRUE will break the processing; FALSE continue with the next plugin; integer set a new index and break the processing
+	 */
+	public function parse($index, $char, $previousChar, $state)
+		{
+		// Start of @keyframes at-rule block
+		if ($char === "@" && $state === "T_DOCUMENT" && strtolower(substr($this->parser->getSource(), $index, 10)) === "@keyframes")
+			{
+			$this->parser->pushState("T_AT_KEYFRAMES::NAME");
+			$this->parser->clearBuffer();
+			return $index + 10;
+			}
+		// Start of @keyframes rulesets
+		elseif ($char === "{" && $state === "T_AT_KEYFRAMES::NAME")
+			{
+			$name = $this->parser->getAndClearBuffer("{\"'");
+			$this->parser->setState("T_AT_KEYFRAMES_RULESETS");
+			$this->parser->clearBuffer();
+			$this->parser->appendToken(new CssAtKeyframesStartToken($name));
+			}
+		// Start of @keyframe ruleset and selectors
+		if ($char === "," && $state === "T_AT_KEYFRAMES_RULESETS")
+			{
+			$this->selectors[] = $this->parser->getAndClearBuffer(",{");
+			}
+		// Start of a @keyframes ruleset
+		elseif ($char === "{" && $state === "T_AT_KEYFRAMES_RULESETS")
+			{
+			if ($this->parser->getBuffer() !== "")
+				{
+				$this->selectors[] = $this->parser->getAndClearBuffer(",{");
+				$this->parser->pushState("T_AT_KEYFRAMES_RULESET");
+				$this->parser->appendToken(new CssAtKeyframesRulesetStartToken($this->selectors));
+				$this->selectors = array();
+				}
+			}
+		// Start of @keyframes ruleset declaration
+		elseif ($char === ":" && $state === "T_AT_KEYFRAMES_RULESET")
+			{
+			$this->parser->pushState("T_AT_KEYFRAMES_RULESET_DECLARATION");
+			$this->buffer = $this->parser->getAndClearBuffer(":;", true);
+			}
+		// Unterminated @keyframes ruleset declaration
+		elseif ($char === ":" && $state === "T_AT_KEYFRAMES_RULESET_DECLARATION")
+			{
+			// Ignore Internet Explorer filter declarations
+			if ($this->buffer === "filter")
+				{
+				return false;
+				}
+			trigger_error(new CssError(__METHOD__ . ": Unterminated @keyframes ruleset declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
+			}
+		// End of declaration
+		elseif (($char === ";" || $char === "}") && $state === "T_AT_KEYFRAMES_RULESET_DECLARATION")
+			{
+			$value = $this->parser->getAndClearBuffer(";}");
+			if (strtolower(substr($value, -10, 10)) === "!important")
+				{
+				$value = trim(substr($value, 0, -10));
+				$isImportant = true;
+				}
+			else
+				{
+				$isImportant = false;
+				}
+			$this->parser->popState();
+			$this->parser->appendToken(new CssAtKeyframesRulesetDeclarationToken($this->buffer, $value, $isImportant));
+			// Declaration ends with a right curly brace; so we have to end the ruleset
+			if ($char === "}")
+				{
+				$this->parser->appendToken(new CssAtKeyframesRulesetEndToken());
+				$this->parser->popState();
+				}
+			$this->buffer = "";
+			}
+		// End of @keyframes ruleset
+		elseif ($char === "}" && $state === "T_AT_KEYFRAMES_RULESET")
+			{
+			$this->parser->clearBuffer();
+			
+			$this->parser->popState();
+			$this->parser->appendToken(new CssAtKeyframesRulesetEndToken());
+			}
+		// End of @keyframes rulesets
+		elseif ($char === "}" && $state === "T_AT_KEYFRAMES_RULESETS")
+			{
+			$this->parser->clearBuffer();
+			$this->parser->popState();
+			$this->parser->appendToken(new CssAtKeyframesEndToken());
+			}
+		else
+			{
+			return false;
+			}
+		return true;
+		}
+	}
+
+/**
+ * This {@link aCssToken CSS token} represents the end of a @keyframes at-rule block.
+ *
+ * @package		CssMin/Tokens
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+class CssAtKeyframesEndToken extends aCssRightCurlyBraceToken
 	{
 	
 	}

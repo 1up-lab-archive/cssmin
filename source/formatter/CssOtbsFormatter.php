@@ -46,6 +46,11 @@ class CssOtbsFormatter extends aCssFormatter
 				{
 				$r[] = $indent . "@import " . $token->Import . " " . implode(", ", $token->MediaTypes) . ";";
 				}
+			elseif ($class === "CssAtKeyframesStartToken")
+				{
+				$r[] = $indent . "@keyframes \"" . $token->Name . "\" {";
+				$level++;
+				}
 			elseif ($class === "CssAtMediaStartToken")
 				{
 				$r[] = $indent . "@media " . implode(", ", $token->MediaTypes) . " {";
@@ -61,12 +66,17 @@ class CssOtbsFormatter extends aCssFormatter
 				$r[] = $indent . "@variables " . implode(", ", $token->MediaTypes) . " {";
 				$level++;
 				}
-			elseif ($class === "CssRulesetStartToken")
+			elseif ($class === "CssRulesetStartToken" || $class === "CssAtKeyframesRulesetStartToken")
 				{
 				$r[] = $indent . implode(", ", $token->Selectors) . " {";
 				$level++;
 				}
-			elseif ($class == "CssAtFontFaceDeclarationToken" || $class === "CssAtPageDeclarationToken" || $class == "CssAtVariablesDeclarationToken" || $class === "CssRulesetDeclarationToken")
+			elseif ($class == "CssAtFontFaceDeclarationToken"
+				|| $class === "CssAtKeyframesRulesetDeclarationToken"
+				|| $class === "CssAtPageDeclarationToken"
+				|| $class == "CssAtVariablesDeclarationToken"
+				|| $class === "CssRulesetDeclarationToken"
+				)
 				{
 				$declaration = $indent . $token->Property . ": ";
 				if ($this->padding)
@@ -75,7 +85,14 @@ class CssOtbsFormatter extends aCssFormatter
 					}
 				$r[] = $declaration . $token->Value . ($token->IsImportant ? " !important" : "") . ";";
 				}
-			elseif ($class === "CssAtMediaEndToken" || $class === "CssAtFontFaceEndToken" || $class === "CssAtPageEndToken" || $class == "CssAtVariablesEndToken" || $class === "CssRulesetEndToken")
+			elseif ($class === "CssAtFontFaceEndToken"
+				|| $class === "CssAtMediaEndToken"
+				|| $class === "CssAtKeyframesEndToken"
+				|| $class === "CssAtKeyframesRulesetEndToken"
+				|| $class === "CssAtPageEndToken"
+				|| $class === "CssAtVariablesEndToken"
+				|| $class === "CssRulesetEndToken"
+				)
 				{
 				$level--;
 				$r[] = str_repeat($indent, $level) . "}";

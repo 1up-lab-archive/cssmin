@@ -1,6 +1,7 @@
 <?php
 /**
- * This {@link aCssMinifierFilter minifier filter} will remove any empty @font-faxce, @media and @page at-rule blocks.
+ * This {@link aCssMinifierFilter minifier filter} will remove any empty @font-face, @keyframes, @media and @page 
+ * at-rule blocks.
  * 
  * @package		CssMin/Minifier/Filters
  * @link		http://code.google.com/p/cssmin/
@@ -25,6 +26,7 @@ class CssRemoveEmptyAtBlocksMinifierFilter extends aCssMinifierFilter
 			$current	= get_class($tokens[$i]);
 			$next		= isset($tokens[$i + 1]) ? get_class($tokens[$i + 1]) : false;
 			if (($current === "CssAtFontFaceStartToken" && $next === "CssAtFontFaceEndToken") ||
+				($current === "CssAtKeyframesStartToken" && $next === "CssAtKeyframesEndToken") ||
 				($current === "CssAtPageStartToken" && $next === "CssAtPageEndToken") ||
 				($current === "CssAtMediaStartToken" && $next === "CssAtMediaEndToken"))
 				{

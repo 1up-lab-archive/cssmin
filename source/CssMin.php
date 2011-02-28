@@ -40,9 +40,20 @@ class CssMin
 	 */
 	private static $classIndex = array();
 	/**
-	 * Create a build version of CssMin.
+	 * @link http://goo.gl/JrW54 Autoload} function of CssMin.
 	 * 
-	 * The php source get minifed by using the php function {@link http://goo.gl/eIcoH php_strip_whitespace()}.
+	 * @param string $class Name of the class
+	 * @return void
+	 */
+	public static function autoload($class)
+		{
+		if (isset(self::$classIndex[$class]))
+			{
+			require(self::$classIndex[$class]);
+			}
+		}
+	/**
+	 * Create a build version of CssMin.
 	 * 
 	 * @param string $target Path including file name were the build version should be saved [optional]
 	 * @return string Minifed build version
@@ -86,19 +97,6 @@ class CssMin
 			return false;
 			}
 		return $source;
-		}
-	/**
-	 * @link http://goo.gl/JrW54 Autoload} function of CssMin.
-	 * 
-	 * @param string $class Name of the class
-	 * @return void
-	 */
-	public static function autoload($class)
-		{
-		if (isset(self::$classIndex[$class]))
-			{
-			require(self::$classIndex[$class]);
-			}
 		}
 	/**
 	 * Initialises CssMin.

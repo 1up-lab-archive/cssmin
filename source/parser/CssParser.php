@@ -80,6 +80,7 @@ class CssParser
 			"AtCharset"		=> true,
 			"AtFontFace"	=> true,
 			"AtImport"		=> true,
+			"AtKeyframes"	=> true,
 			"AtMedia"		=> true,
 			"AtPage"		=> true,
 			"AtVariables"	=> true

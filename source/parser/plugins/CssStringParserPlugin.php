@@ -57,7 +57,7 @@ class CssStringParserPlugin extends aCssParserPlugin
 		// Escaped LF in string => remove escape backslash and LF
 		elseif ($char === "\n" && $previousChar === "\\" && $state === "T_STRING")
 			{
-			$this->parser->setBuffer(substr($this->parser->getBuffer, 0, -2));
+			$this->parser->setBuffer(substr($this->parser->getBuffer(), 0, -2));
 			}
 		// Parse error: Unescaped LF in string literal
 		elseif ($char === "\n" && $previousChar !== "\\" && $state === "T_STRING")

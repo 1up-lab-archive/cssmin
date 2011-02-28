@@ -48,6 +48,7 @@ class CssMinifier
 			"RemoveEmptyRulesets"			=> true,
 			"RemoveEmptyAtBlocks"			=> true,
 			"ConvertLevel3Properties"		=> false,
+			"ConvertLevel3AtKeyframes"		=> false,
 			"Variables"						=> true,
 			"RemoveLastDelarationSemiColon"	=> true
 			), is_array($filters) ? $filters : array());

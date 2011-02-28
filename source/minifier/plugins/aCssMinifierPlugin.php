@@ -46,7 +46,9 @@ abstract class aCssMinifierPlugin
 	 */
 	abstract public function apply(aCssToken &$token);
 	/**
+	 * --
 	 * 
+	 * @return array
 	 */
 	abstract public function getTriggerTokens();
 	}
