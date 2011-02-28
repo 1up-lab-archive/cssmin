@@ -299,8 +299,6 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 		$ieValue = (int) ((float) $token->Value * 100);
 		$r = array
 			(
-			// Firefox < 3.5
-			new CssRulesetDeclarationToken("-moz-opacity", $token->Value, $token->MediaTypes),
 			// Internet Explorer >= 8
 			new CssRulesetDeclarationToken("-ms-filter", "\"alpha(opacity=" . $ieValue . ")\"", $token->MediaTypes),
 			// Internet Explorer >= 4 <= 7
