@@ -9,8 +9,16 @@
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssNullToken extends aCssNullToken
+class CssNullToken extends aCssToken
 	{
-	
+	/**
+	 * Implements {@link aCssToken::__toString()}.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+		{
+		return "";
+		}
 	}
 ?>

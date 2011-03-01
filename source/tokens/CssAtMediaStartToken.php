@@ -9,7 +9,7 @@
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtMediaStartToken extends aCssToken
+class CssAtMediaStartToken extends aCssAtBlockStartToken
 	{
 	/**
 	 * Sets the properties of the @media at-rule.

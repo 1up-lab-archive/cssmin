@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract definition of a CSS token class returning only a right curly brace.
+ * Abstract definition of a for a ruleset start token.
  *
  * @package		CssMin/Tokens
  * @link		http://code.google.com/p/cssmin/
@@ -9,16 +9,8 @@
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-abstract class aCssRightCurlyBraceToken extends aCssToken
+abstract class aCssRulesetStartToken extends aCssToken
 	{
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return "}";
-		}
+	
 	}
 ?>

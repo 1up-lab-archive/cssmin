@@ -9,38 +9,14 @@
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssRulesetDeclarationToken extends aCssToken
+class CssRulesetDeclarationToken extends aCssDeclarationToken
 	{
-	/**
-	 * Property name of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Property = "";
-	/**
-	 * Is the declaration flagged as important?
-	 * 
-	 * @var boolean
-	 */
-	public $IsImportant = false;
-	/**
-	 * Is the declaration flagged as last one of the ruleset?
-	 * 
-	 * @var boolean
-	 */
-	public $IsLast = false;
 	/**
 	 * Media types of the declaration.
 	 * 
 	 * @var array
 	 */
 	public $MediaTypes = array("all");
-	/**
-	 * Value of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Value = "";
 	/**
 	 * Set the properties of a ddocument- or at-rule @media level declaration. 
 	 * 
@@ -53,20 +29,8 @@ class CssRulesetDeclarationToken extends aCssToken
 	 */
 	public function __construct($property, $value, $mediaTypes = null, $isImportant = false, $isLast = false)
 		{
-		$this->Property		= $property;
-		$this->Value		= $value;
+		parent::__construct($property, $value, $isImportant, $isLast);
 		$this->MediaTypes	= $mediaTypes ? $mediaTypes : array("all");
-		$this->IsImportant	= $isImportant;
-		$this->IsLast		= $isLast;
-		}
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return $this->Property . ":" . $this->Value . ($this->IsImportant ? " !important" : "") . ($this->IsLast ? "" : ";");
 		}
 	}
 ?>

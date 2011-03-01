@@ -9,7 +9,7 @@
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtKeyframesRulesetStartToken extends aCssToken
+class CssAtKeyframesRulesetStartToken extends aCssRulesetStartToken
 	{
 	/**
 	 * Array of selectors.

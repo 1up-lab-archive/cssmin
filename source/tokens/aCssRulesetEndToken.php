@@ -1,6 +1,6 @@
 <?php
 /**
- * This {@link aCssToken CSS token} represents the start of a @font-face at-rule block.
+ * Abstract definition of a for ruleset end token.
  *
  * @package		CssMin/Tokens
  * @link		http://code.google.com/p/cssmin/
@@ -9,7 +9,7 @@
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtFontFaceStartToken extends aCssAtBlockStartToken
+abstract class aCssRulesetEndToken extends aCssToken
 	{
 	/**
 	 * Implements {@link aCssToken::__toString()}.
@@ -18,7 +18,7 @@ class CssAtFontFaceStartToken extends aCssAtBlockStartToken
 	 */
 	public function __toString()
 		{
-		return "@font-face{";
+		return "}";
 		}
 	}
 ?>

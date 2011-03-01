@@ -9,7 +9,7 @@
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtVariablesStartToken extends aCssNullToken
+class CssAtVariablesStartToken extends aCssAtBlockStartToken
 	{
 	/**
 	 * Media types of the @variables at-rule block.
@@ -26,6 +26,15 @@ class CssAtVariablesStartToken extends aCssNullToken
 	public function __construct($mediaTypes = null)
 		{
 		$this->MediaTypes = $mediaTypes ? $mediaTypes : array("all");
+		}
+	/**
+	 * Implements {@link aCssToken::__toString()}.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+		{
+		return "";
 		}
 	}
 ?>

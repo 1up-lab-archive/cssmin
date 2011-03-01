@@ -54,7 +54,7 @@ abstract class aCssToken
 	}
 
 /**
- * Abstract definition of a CSS token class returning only a right curly brace.
+ * Abstract definition of a for a ruleset start token.
  *
  * @package		CssMin/Tokens
  * @link		http://code.google.com/p/cssmin/
@@ -63,7 +63,22 @@ abstract class aCssToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-abstract class aCssRightCurlyBraceToken extends aCssToken
+abstract class aCssRulesetStartToken extends aCssToken
+	{
+	
+	}
+
+/**
+ * Abstract definition of a for ruleset end token.
+ *
+ * @package		CssMin/Tokens
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+abstract class aCssRulesetEndToken extends aCssToken
 	{
 	/**
 	 * Implements {@link aCssToken::__toString()}.
@@ -142,29 +157,6 @@ abstract class aCssParserPlugin
 	 * @return mixed TRUE will break the processing; FALSE continue with the next plugin; integer set a new index and break the processing
 	 */
 	abstract public function parse($index, $char, $previousChar, $state);
-	}
-
-/**
- * Abstract definition of a CSS token class that returning only a empty string.
- *
- * @package		CssMin/Tokens
- * @link		http://code.google.com/p/cssmin/
- * @author		Joe Scylla <joe.scylla@gmail.com>
- * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
- */
-abstract class aCssNullToken extends aCssToken
-	{
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return "";
-		}
 	}
 
 /**
@@ -320,6 +312,107 @@ abstract class aCssFormatter
 	 * @return string
 	 */
 	abstract public function __toString();
+	}
+
+/**
+ * Abstract definition of a ruleset declaration token.
+ *
+ * @package		CssMin/Tokens
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+abstract class aCssDeclarationToken extends aCssToken
+	{
+	/**
+	 * Is the declaration flagged as important?
+	 * 
+	 * @var boolean
+	 */
+	public $IsImportant = false;
+	/**
+	 * Is the declaration flagged as last one of the ruleset?
+	 * 
+	 * @var boolean
+	 */
+	public $IsLast = false;
+	/**
+	 * Property name of the declaration.
+	 * 
+	 * @var string
+	 */
+	public $Property = "";
+	/**
+	 * Value of the declaration.
+	 * 
+	 * @var string
+	 */
+	public $Value = "";
+	/**
+	 * Set the properties of the @font-face declaration. 
+	 * 
+	 * @param string $property Property of the declaration
+	 * @param string $value Value of the declaration
+	 * @param boolean $isImportant Is the !important flag is set?
+	 * @param boolean $IsLast Is the declaration the last one of the block?
+	 * @return void
+	 */
+	public function __construct($property, $value, $isImportant = false, $isLast = false)
+		{
+		$this->Property		= $property;
+		$this->Value		= $value;
+		$this->IsImportant	= $isImportant;
+		$this->IsLast		= $isLast;
+		}
+	/**
+	 * Implements {@link aCssToken::__toString()}.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+		{
+		return $this->Property . ":" . $this->Value . ($this->IsImportant ? " !important" : "") . ($this->IsLast ? "" : ";");
+		}
+	}
+
+/**
+ * Abstract definition of a for at-rule block start token.
+ *
+ * @package		CssMin/Tokens
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+abstract class aCssAtBlockStartToken extends aCssToken
+	{
+	
+	}
+
+/**
+ * Abstract definition of a for at-rule block end token.
+ *
+ * @package		CssMin/Tokens
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Joe Scylla <joe.scylla@gmail.com>
+ * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.0
+ */
+abstract class aCssAtBlockEndToken extends aCssToken
+	{
+	/**
+	 * Implements {@link aCssToken::__toString()}.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+		{
+		return "}";
+		}
 	}
 
 /**
@@ -807,7 +900,7 @@ class CssStringParserPlugin extends aCssParserPlugin
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssRulesetStartToken extends aCssToken
+class CssRulesetStartToken extends aCssRulesetStartToken
 	{
 	/**
 	 * Array of selectors.
@@ -975,7 +1068,7 @@ class CssRulesetParserPlugin extends aCssParserPlugin
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssRulesetEndToken extends aCssRightCurlyBraceToken
+class CssRulesetEndToken extends aCssRulesetEndToken
 	{
 	
 	}
@@ -990,38 +1083,14 @@ class CssRulesetEndToken extends aCssRightCurlyBraceToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssRulesetDeclarationToken extends aCssToken
+class CssRulesetDeclarationToken extends aCssDeclarationToken
 	{
-	/**
-	 * Property name of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Property = "";
-	/**
-	 * Is the declaration flagged as important?
-	 * 
-	 * @var boolean
-	 */
-	public $IsImportant = false;
-	/**
-	 * Is the declaration flagged as last one of the ruleset?
-	 * 
-	 * @var boolean
-	 */
-	public $IsLast = false;
 	/**
 	 * Media types of the declaration.
 	 * 
 	 * @var array
 	 */
 	public $MediaTypes = array("all");
-	/**
-	 * Value of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Value = "";
 	/**
 	 * Set the properties of a ddocument- or at-rule @media level declaration. 
 	 * 
@@ -1034,20 +1103,8 @@ class CssRulesetDeclarationToken extends aCssToken
 	 */
 	public function __construct($property, $value, $mediaTypes = null, $isImportant = false, $isLast = false)
 		{
-		$this->Property		= $property;
-		$this->Value		= $value;
+		parent::__construct($property, $value, $isImportant, $isLast);
 		$this->MediaTypes	= $mediaTypes ? $mediaTypes : array("all");
-		$this->IsImportant	= $isImportant;
-		$this->IsLast		= $isLast;
-		}
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return $this->Property . ":" . $this->Value . ($this->IsImportant ? " !important" : "") . ($this->IsLast ? "" : ";");
 		}
 	}
 
@@ -1115,7 +1172,7 @@ class CssRemoveEmptyRulesetsMinifierFilter extends aCssMinifierFilter
 			$current	= get_class($tokens[$i]);
 			$next		= isset($tokens[$i + 1]) ? get_class($tokens[$i + 1]) : false;
 			if (($current === "CssRulesetStartToken" && $next === "CssRulesetEndToken") ||
-				($current === "CssAtKeyframesRulesetStartToken" && $next === "CssAtKeyframesRulesetEndToken")
+				($current === "CssAtKeyframesRulesetStartToken" && $next === "CssAtKeyframesRulesetEndToken" && !array_intersect(array("from", "0%", "to", "100%"), array_map("strtolower", $tokens[$i]->Selectors)))
 				)
 				{
 				$tokens[$i]		= null;
@@ -1734,9 +1791,17 @@ class CssOtbsFormatter extends aCssFormatter
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssNullToken extends aCssNullToken
+class CssNullToken extends aCssToken
 	{
-	
+	/**
+	 * Implements {@link aCssToken::__toString()}.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+		{
+		return "";
+		}
 	}
 
 /**
@@ -3053,8 +3118,6 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 		$ieValue = (int) ((float) $token->Value * 100);
 		$r = array
 			(
-			// Firefox < 3.5
-			new CssRulesetDeclarationToken("-moz-opacity", $token->Value, $token->MediaTypes),
 			// Internet Explorer >= 8
 			new CssRulesetDeclarationToken("-ms-filter", "\"alpha(opacity=" . $ieValue . ")\"", $token->MediaTypes),
 			// Internet Explorer >= 4 <= 7
@@ -3696,7 +3759,7 @@ class CssCommentParserPlugin extends aCssParserPlugin
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtVariablesStartToken extends aCssNullToken
+class CssAtVariablesStartToken extends aCssAtBlockStartToken
 	{
 	/**
 	 * Media types of the @variables at-rule block.
@@ -3713,6 +3776,15 @@ class CssAtVariablesStartToken extends aCssNullToken
 	public function __construct($mediaTypes = null)
 		{
 		$this->MediaTypes = $mediaTypes ? $mediaTypes : array("all");
+		}
+	/**
+	 * Implements {@link aCssToken::__toString()}.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+		{
+		return "";
 		}
 	}
 
@@ -3831,9 +3903,17 @@ class CssAtVariablesParserPlugin extends aCssParserPlugin
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtVariablesEndToken extends aCssNullToken
+class CssAtVariablesEndToken extends aCssAtBlockEndToken
 	{
-	
+	/**
+	 * Implements {@link aCssToken::__toString()}.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+		{
+		return "";
+		}
 	}
 
 /**
@@ -3846,39 +3926,16 @@ class CssAtVariablesEndToken extends aCssNullToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtVariablesDeclarationToken extends aCssNullToken
+class CssAtVariablesDeclarationToken extends aCssDeclarationToken
 	{
 	/**
-	 * Property name of the declaration.
+	 * Implements {@link aCssToken::__toString()}.
 	 * 
-	 * @var string
+	 * @return string
 	 */
-	public $Property = "";
-	/**
-	 * Is the declaration flagged as important?
-	 * 
-	 * @var boolean
-	 */
-	public $IsImportant = false;
-	/**
-	 * Value of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Value = "";
-	/**
-	 * Set the properties of the @variables declaration. 
-	 * 
-	 * @param string $property Property of the declaration
-	 * @param string $value Value of the declaration
-	 * @param boolean $isImportant Is the !important flag is set?
-	 * @return void
-	 */
-	public function __construct($property, $value, $isImportant = false)
+	public function __toString()
 		{
-		$this->Property		= $property;
-		$this->Value		= $value;
-		$this->IsImportant	= $isImportant;
+		return "";
 		}
 	}
 
@@ -3892,7 +3949,7 @@ class CssAtVariablesDeclarationToken extends aCssNullToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtPageStartToken extends aCssToken
+class CssAtPageStartToken extends aCssAtBlockStartToken
 	{
 	/**
 	 * Selector.
@@ -4043,7 +4100,7 @@ class CssAtPageParserPlugin extends aCssParserPlugin
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtPageEndToken extends aCssRightCurlyBraceToken
+class CssAtPageEndToken extends aCssAtBlockEndToken
 	{
 	
 	}
@@ -4058,57 +4115,9 @@ class CssAtPageEndToken extends aCssRightCurlyBraceToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtPageDeclarationToken extends aCssToken
+class CssAtPageDeclarationToken extends aCssDeclarationToken
 	{
-	/**
-	 * Property name of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Property = "";
-	/**
-	 * Is the declaration flagged as important?
-	 * 
-	 * @var boolean
-	 */
-	public $IsImportant = false;
-	/**
-	 * Is the declaration flagged as last one of the block?
-	 * 
-	 * @var boolean
-	 */
-	public $IsLast = false;
-	/**
-	 * Value of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Value = "";
-	/**
-	 * Set the properties of the @page declaration. 
-	 * 
-	 * @param string $property Property of the declaration
-	 * @param string $value Value of the declaration
-	 * @param boolean $isImportant Is the !important flag is set?
-	 * @param boolean $isLast Is the declaration the last one of the block
-	 * @return void
-	 */
-	public function __construct($property, $value, $isImportant = false, $isLast = false)
-		{
-		$this->Property		= $property;
-		$this->Value		= $value;
-		$this->IsImportant	= $isImportant;
-		$this->IsLast		= $isLast;
-		}
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return $this->Property . ":" . $this->Value . ($this->IsImportant ? " !important" : "") . ";";
-		}
+	
 	}
 
 /**
@@ -4121,7 +4130,7 @@ class CssAtPageDeclarationToken extends aCssToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtMediaStartToken extends aCssToken
+class CssAtMediaStartToken extends aCssAtBlockStartToken
 	{
 	/**
 	 * Sets the properties of the @media at-rule.
@@ -4226,7 +4235,7 @@ class CssAtMediaParserPlugin extends aCssParserPlugin
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtMediaEndToken extends aCssRightCurlyBraceToken
+class CssAtMediaEndToken extends aCssAtBlockEndToken
 	{
 	
 	}
@@ -4241,7 +4250,7 @@ class CssAtMediaEndToken extends aCssRightCurlyBraceToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtKeyframesStartToken extends aCssToken
+class CssAtKeyframesStartToken extends aCssAtBlockStartToken
 	{
 	/**
 	 * Name of the at-rule.
@@ -4286,7 +4295,7 @@ class CssAtKeyframesStartToken extends aCssToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtKeyframesRulesetStartToken extends aCssToken
+class CssAtKeyframesRulesetStartToken extends aCssRulesetStartToken
 	{
 	/**
 	 * Array of selectors.
@@ -4325,7 +4334,7 @@ class CssAtKeyframesRulesetStartToken extends aCssToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtKeyframesRulesetEndToken extends aCssRightCurlyBraceToken
+class CssAtKeyframesRulesetEndToken extends aCssRulesetEndToken
 	{
 	
 	}
@@ -4340,57 +4349,9 @@ class CssAtKeyframesRulesetEndToken extends aCssRightCurlyBraceToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtKeyframesRulesetDeclarationToken extends aCssToken
+class CssAtKeyframesRulesetDeclarationToken extends aCssDeclarationToken
 	{
-	/**
-	 * Property name of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Property = "";
-	/**
-	 * Is the declaration flagged as important?
-	 * 
-	 * @var boolean
-	 */
-	public $IsImportant = false;
-	/**
-	 * Is the declaration flagged as last one of the ruleset?
-	 * 
-	 * @var boolean
-	 */
-	public $IsLast = false;
-	/**
-	 * Value of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Value = "";
-	/**
-	 * Set the properties of a ddocument- or at-rule @media level declaration. 
-	 * 
-	 * @param string $property Property of the declaration
-	 * @param string $value Value of the declaration
-	 * @param boolean $isImportant Is the !important flag is set
-	 * @param boolean $isLast Is the declaration the last one of the ruleset
-	 * @return void
-	 */
-	public function __construct($property, $value, $isImportant = false, $isLast = false)
-		{
-		$this->Property		= $property;
-		$this->Value		= $value;
-		$this->IsImportant	= $isImportant;
-		$this->IsLast		= $isLast;
-		}
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return $this->Property . ":" . $this->Value . ($this->IsImportant ? " !important" : "") . ($this->IsLast ? "" : ";");
-		}
+	
 	}
 
 /**
@@ -4542,7 +4503,7 @@ class CssAtKeyframesParserPlugin extends aCssParserPlugin
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtKeyframesEndToken extends aCssRightCurlyBraceToken
+class CssAtKeyframesEndToken extends aCssAtBlockEndToken
 	{
 	
 	}
@@ -4688,7 +4649,7 @@ class CssAtImportParserPlugin extends aCssParserPlugin
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtFontFaceStartToken extends aCssToken
+class CssAtFontFaceStartToken extends aCssAtBlockStartToken
 	{
 	/**
 	 * Implements {@link aCssToken::__toString()}.
@@ -4822,7 +4783,7 @@ class CssAtFontFaceParserPlugin extends aCssParserPlugin
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtFontFaceEndToken extends aCssRightCurlyBraceToken
+class CssAtFontFaceEndToken extends aCssAtBlockEndToken
 	{
 	
 	}
@@ -4837,57 +4798,9 @@ class CssAtFontFaceEndToken extends aCssRightCurlyBraceToken
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtFontFaceDeclarationToken extends aCssToken
+class CssAtFontFaceDeclarationToken extends aCssDeclarationToken
 	{
-	/**
-	 * Property name of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Property = "";
-	/**
-	 * Is the declaration flagged as important?
-	 * 
-	 * @var boolean
-	 */
-	public $IsImportant = false;
-	/**
-	 * Is the declaration flagged as last one of the block?
-	 * 
-	 * @var boolean
-	 */
-	public $IsLast = false;
-	/**
-	 * Value of the declaration.
-	 * 
-	 * @var string
-	 */
-	public $Value = "";
-	/**
-	 * Set the properties of the @font-face declaration. 
-	 * 
-	 * @param string $property Property of the declaration
-	 * @param string $value Value of the declaration
-	 * @param boolean $isImportant Is the !important flag is set?
-	 * @param boolean $IsLast Is the declaration the last one of the block?
-	 * @return void
-	 */
-	public function __construct($property, $value, $isImportant = false, $isLast = false)
-		{
-		$this->Property		= $property;
-		$this->Value		= $value;
-		$this->IsImportant	= $isImportant;
-		$this->IsLast		= false;
-		}
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return $this->Property . ":" . $this->Value . ($this->IsImportant ? " !important" : "") . ";";
-		}
+	
 	}
 
 /**

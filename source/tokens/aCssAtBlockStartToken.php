@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract definition of a CSS token class that returning only a empty string.
+ * Abstract definition of a for at-rule block start token.
  *
  * @package		CssMin/Tokens
  * @link		http://code.google.com/p/cssmin/
@@ -9,16 +9,8 @@
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-abstract class aCssNullToken extends aCssToken
+abstract class aCssAtBlockStartToken extends aCssToken
 	{
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return "";
-		}
+	
 	}
 ?>

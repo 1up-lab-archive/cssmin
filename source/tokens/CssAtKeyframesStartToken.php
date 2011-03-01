@@ -9,7 +9,7 @@
  * @license		http://opensource.org/licenses/mit-license.php MIT License
  * @version		3.0.0
  */
-class CssAtKeyframesStartToken extends aCssToken
+class CssAtKeyframesStartToken extends aCssAtBlockStartToken
 	{
 	/**
 	 * Name of the at-rule.
