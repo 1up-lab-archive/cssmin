@@ -60,6 +60,22 @@ class CssVariablesMinifierFilter extends aCssMinifierFilter
 					}
 				}
 			}
+		// Variables in @variables at-rule blocks
+		foreach($variables as $mediaType => $null)
+			{
+			foreach($variables[$mediaType] as $variable => $value)
+				{
+				// If a var() statement in a variable value found...
+				if (stripos($value, "var") !== false && preg_match_all("/var\((.+)\)/iSU", $value, $m))
+					{
+					// ... then replace the var() statement with the variable values.
+					for ($i = 0, $l = count($m[0]); $i < $l; $i++)
+						{
+						$variables[$mediaType][$variable] = str_replace($m[0][$i], (isset($variables[$mediaType][$m[1][$i]]) ? $variables[$mediaType][$m[1][$i]] : ""), $variables[$mediaType][$variable]);
+						}
+					}
+				}
+			}
 		// Remove the complete @variables at-rule block
 		foreach ($remove as $i)
 			{
