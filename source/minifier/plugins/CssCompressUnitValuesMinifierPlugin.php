@@ -36,14 +36,14 @@ class CssCompressUnitValuesMinifierPlugin extends aCssMinifierPlugin
 		(
 		"/(^| |-)0\.([0-9]+?)(0+)?(%|em|ex|px|in|cm|mm|pt|pc)/iS" => "\${1}.\${2}\${4}",
 		"/(^| )-?(\.?)0(%|em|ex|px|in|cm|mm|pt|pc)/iS" => "\${1}0",
-		"/^(0 0 0 0)|(0 0 0)|(0 0)$/iS" => "0"
+		"/(^0\s0\s0\s0)|(^0\s0\s0$)|(^0\s0$)/iS" => "0"
 		);
 	/**
 	 * Regular expression matching the value.
 	 * 
 	 * @var string
 	 */
-	private $reMatch = "/(^| |-)0\.([0-9]+?)(0+)?(%|em|ex|px|in|cm|mm|pt|pc)|(^| )-?(\.?)0(%|em|ex|px|in|cm|mm|pt|pc)|^(0 0 0 0)|(0 0 0)|(0 0)$/iS";
+	private $reMatch = "/(^| |-)0\.([0-9]+?)(0+)?(%|em|ex|px|in|cm|mm|pt|pc)|(^| )-?(\.?)0(%|em|ex|px|in|cm|mm|pt|pc)|(^0\s0\s0\s0$)|(^0\s0\s0$)|(^0\s0$)/iS";
 	/**
 	 * Implements {@link aCssMinifierPlugin::minify()}.
 	 * 

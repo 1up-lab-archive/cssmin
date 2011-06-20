@@ -109,14 +109,22 @@ class CssMin
 		$paths = array(dirname(__FILE__));
 		while (list($i, $path) = each($paths))
 			{
-			foreach (glob($path . "*", GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT) as $subDirectory)
+			$subDirectorys = glob($path . "*", GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT);
+			if (is_array($subDirectorys))
 				{
-				$paths[] = $subDirectory;
+				foreach ($subDirectorys as $subDirectory)
+					{
+					$paths[] = $subDirectory;
+					}
 				}
-			foreach (glob($path . "*.php", 0) as $file)
+			$files = glob($path . "*.php", 0);
+			if (is_array($files))
 				{
-				$class = substr(basename($file), 0, -4);
-				self::$classIndex[$class] = $file;
+				foreach ($files as $file)
+					{
+					$class = substr(basename($file), 0, -4);
+					self::$classIndex[$class] = $file;
+					}
 				}
 			}
 		krsort(self::$classIndex);

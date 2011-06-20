@@ -696,6 +696,22 @@ class CssVariablesMinifierFilter extends aCssMinifierFilter
 					}
 				}
 			}
+		// Variables in @variables at-rule blocks
+		foreach($variables as $mediaType => $null)
+			{
+			foreach($variables[$mediaType] as $variable => $value)
+				{
+				// If a var() statement in a variable value found...
+				if (stripos($value, "var") !== false && preg_match_all("/var\((.+)\)/iSU", $value, $m))
+					{
+					// ... then replace the var() statement with the variable values.
+					for ($i = 0, $l = count($m[0]); $i < $l; $i++)
+						{
+						$variables[$mediaType][$variable] = str_replace($m[0][$i], (isset($variables[$mediaType][$m[1][$i]]) ? $variables[$mediaType][$m[1][$i]] : ""), $variables[$mediaType][$variable]);
+						}
+					}
+				}
+			}
 		// Remove the complete @variables at-rule block
 		foreach ($remove as $i)
 			{
@@ -2124,14 +2140,22 @@ class CssMin
 		$paths = array(dirname(__FILE__));
 		while (list($i, $path) = each($paths))
 			{
-			foreach (glob($path . "*", GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT) as $subDirectory)
+			$subDirectorys = glob($path . "*", GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT);
+			if (is_array($subDirectorys))
 				{
-				$paths[] = $subDirectory;
+				foreach ($subDirectorys as $subDirectory)
+					{
+					$paths[] = $subDirectory;
+					}
 				}
-			foreach (glob($path . "*.php", 0) as $file)
+			$files = glob($path . "*.php", 0);
+			if (is_array($files))
 				{
-				$class = substr(basename($file), 0, -4);
-				self::$classIndex[$class] = $file;
+				foreach ($files as $file)
+					{
+					$class = substr(basename($file), 0, -4);
+					self::$classIndex[$class] = $file;
+					}
 				}
 			}
 		krsort(self::$classIndex);
@@ -3489,14 +3513,14 @@ class CssCompressUnitValuesMinifierPlugin extends aCssMinifierPlugin
 		(
 		"/(^| |-)0\.([0-9]+?)(0+)?(%|em|ex|px|in|cm|mm|pt|pc)/iS" => "\${1}.\${2}\${4}",
 		"/(^| )-?(\.?)0(%|em|ex|px|in|cm|mm|pt|pc)/iS" => "\${1}0",
-		"/^(0 0 0 0)|(0 0 0)|(0 0)$/iS" => "0"
+		"/(^0\s0\s0\s0)|(^0\s0\s0$)|(^0\s0$)/iS" => "0"
 		);
 	/**
 	 * Regular expression matching the value.
 	 * 
 	 * @var string
 	 */
-	private $reMatch = "/(^| |-)0\.([0-9]+?)(0+)?(%|em|ex|px|in|cm|mm|pt|pc)|(^| )-?(\.?)0(%|em|ex|px|in|cm|mm|pt|pc)|^(0 0 0 0)|(0 0 0)|(0 0)$/iS";
+	private $reMatch = "/(^| |-)0\.([0-9]+?)(0+)?(%|em|ex|px|in|cm|mm|pt|pc)|(^| )-?(\.?)0(%|em|ex|px|in|cm|mm|pt|pc)|(^0\s0\s0\s0$)|(^0\s0\s0$)|(^0\s0$)/iS";
 	/**
 	 * Implements {@link aCssMinifierPlugin::minify()}.
 	 * 
