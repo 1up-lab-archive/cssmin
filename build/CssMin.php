@@ -2578,7 +2578,7 @@ class CssConvertRgbColorsMinifierPlugin extends aCssMinifierPlugin
 	 */
 	public function apply(aCssToken &$token)
 		{
-		if (stripos($token->Value, "hsl") !== false && preg_match($this->reMatch, $token->Value, $m))
+		if (stripos($token->Value, "rgb") !== false && preg_match($this->reMatch, $token->Value, $m))
 			{
 			for ($i = 1, $l = count($m); $i < $l; $i++)
 				{
