@@ -8,7 +8,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssImportImportsMinifierFilter extends aCssMinifierFilter
 	{
@@ -28,7 +28,7 @@ class CssImportImportsMinifierFilter extends aCssMinifierFilter
 		{
 		if (!isset($this->configuration["BasePath"]) || !is_dir($this->configuration["BasePath"]))
 			{
-			trigger_error(new CssError(__METHOD__ . ": Base path <code>" . ($this->configuration["BasePath"] ? $this->configuration["BasePath"] : "null"). "</code> is not a directory"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Base path <code>" . ($this->configuration["BasePath"] ? $this->configuration["BasePath"] : "null"). "</code> is not a directory"));
 			return 0;
 			}
 		for ($i = 0, $l = count($tokens); $i < $l; $i++)
@@ -39,12 +39,12 @@ class CssImportImportsMinifierFilter extends aCssMinifierFilter
 				// Import file was not found/is not a file
 				if (!is_file($import))
 					{
-					trigger_error(new CssError(__METHOD__ . ": Import file <code>" . $import. "</code> was not found.", (string) $tokens[$i]), E_USER_WARNING);
+					CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Import file <code>" . $import. "</code> was not found.", (string) $tokens[$i]));
 					}
 				// Import file already imported; remove this @import at-rule to prevent recursions
 				elseif (in_array($import, $this->imported))
 					{
-					trigger_error(new CssError(__METHOD__ . ": Import file <code>" . $import. "</code> was already imported.", (string) $tokens[$i]), E_USER_WARNING);
+					CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Import file <code>" . $import. "</code> was already imported.", (string) $tokens[$i]));
 					$tokens[$i] = null;
 					}
 				else

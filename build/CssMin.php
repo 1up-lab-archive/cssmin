@@ -29,7 +29,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 /**
  * Abstract definition of a CSS token class.
@@ -41,7 +41,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 abstract class aCssToken
 	{
@@ -61,7 +61,7 @@ abstract class aCssToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 abstract class aCssRulesetStartToken extends aCssToken
 	{
@@ -76,7 +76,7 @@ abstract class aCssRulesetStartToken extends aCssToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 abstract class aCssRulesetEndToken extends aCssToken
 	{
@@ -102,7 +102,7 @@ abstract class aCssRulesetEndToken extends aCssToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 abstract class aCssParserPlugin
 	{
@@ -170,7 +170,7 @@ abstract class aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 abstract class aCssMinifierPlugin
 	{
@@ -224,7 +224,7 @@ abstract class aCssMinifierPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 abstract class aCssMinifierFilter
 	{
@@ -271,7 +271,7 @@ abstract class aCssMinifierFilter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 abstract class aCssFormatter
 	{
@@ -322,7 +322,7 @@ abstract class aCssFormatter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 abstract class aCssDeclarationToken extends aCssToken
 	{
@@ -385,7 +385,7 @@ abstract class aCssDeclarationToken extends aCssToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 abstract class aCssAtBlockStartToken extends aCssToken
 	{
@@ -400,7 +400,7 @@ abstract class aCssAtBlockStartToken extends aCssToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 abstract class aCssAtBlockEndToken extends aCssToken
 	{
@@ -423,7 +423,7 @@ abstract class aCssAtBlockEndToken extends aCssToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssWhitesmithsFormatter extends aCssFormatter
 	{
@@ -549,7 +549,7 @@ class CssWhitesmithsFormatter extends aCssFormatter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 	{
@@ -602,7 +602,7 @@ class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 						}
 					}
 				// If no value was found trigger an error and replace the token with a CssNullToken
-				trigger_error(new CssError(__METHOD__ . ": No value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token), E_USER_WARNING);
+				CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": No value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token));
 				$token = new CssNullToken();
 				return true;
 				}
@@ -645,7 +645,7 @@ class CssVariablesMinifierPlugin extends aCssMinifierPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssVariablesMinifierFilter extends aCssMinifierFilter
 	{
@@ -719,7 +719,7 @@ class CssVariablesMinifierFilter extends aCssMinifierFilter
 			}
 		if (!($plugin = $this->minifier->getPlugin("CssVariablesMinifierPlugin")))
 			{
-			trigger_error(new CssError(__METHOD__ . ": The plugin <code>CssVariablesMinifierPlugin</code> was not found but is required for <code>" . __CLASS__ . "</code>"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The plugin <code>CssVariablesMinifierPlugin</code> was not found but is required for <code>" . __CLASS__ . "</code>"));
 			}
 		else
 			{
@@ -739,7 +739,7 @@ class CssVariablesMinifierFilter extends aCssMinifierFilter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssUrlParserPlugin extends aCssParserPlugin
 	{
@@ -789,7 +789,7 @@ class CssUrlParserPlugin extends aCssParserPlugin
 			$this->parser->setBuffer(substr($this->parser->getBuffer(), 0, -1) . ")"); // Replace the LF with the url string delimiter
 			$this->parser->popState();
 			$this->parser->unsetExclusive();
-			trigger_error(new CssError(__METHOD__ . ": Unterminated string literal", $line . "_"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Unterminated string literal", $line . "_"));
 			}
 		// End of string
 		elseif ($char === ")" && $state === "T_URL")
@@ -815,7 +815,7 @@ class CssUrlParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssStringParserPlugin extends aCssParserPlugin
 	{
@@ -872,7 +872,7 @@ class CssStringParserPlugin extends aCssParserPlugin
 			$this->parser->popState();
 			$this->parser->unsetExclusive();
 			$this->parser->setBuffer(substr($this->parser->getBuffer(), 0, -1) . $this->delimiterChar); // Replace the LF with the current string char
-			trigger_error(new CssError(__METHOD__ . ": Unterminated string literal", $line . "_"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Unterminated string literal", $line . "_"));
 			$this->delimiterChar = null;
 			}
 		// End of string
@@ -907,6 +907,96 @@ class CssStringParserPlugin extends aCssParserPlugin
 	}
 
 /**
+ * This {@link aCssMinifierFilter minifier filter} sorts the ruleset declarations of a ruleset by name.
+ * 
+ * @package		CssMin/Minifier/Filters
+ * @link		http://code.google.com/p/cssmin/
+ * @author		Rowan Beentje <http://assanka.net>
+ * @copyright	Rowan Beentje <http://assanka.net>
+ * @license		http://opensource.org/licenses/mit-license.php MIT License
+ * @version		3.0.1
+ */
+class CssSortRulesetPropertiesMinifierFilter extends aCssMinifierFilter
+	{
+	/**
+	 * Implements {@link aCssMinifierFilter::filter()}.
+	 * 
+	 * @param array $tokens Array of objects of type aCssToken
+	 * @return integer Count of added, changed or removed tokens; a return value larger than 0 will rebuild the array
+	 */
+	public function apply(array &$tokens)
+		{
+		$r = 0;
+		for ($i = 0, $l = count($tokens); $i < $l; $i++)
+			{
+			// Only look for ruleset start rules
+			if (get_class($tokens[$i]) !== "CssRulesetStartToken") { continue; }
+			// Look for the corresponding ruleset end
+			$endIndex = false;
+			for ($ii = $i + 1; $ii < $l; $ii++)
+				{
+				if (get_class($tokens[$ii]) !== "CssRulesetEndToken") { continue; }
+				$endIndex = $ii;
+				break;
+				}
+			if (!$endIndex) { break; }
+			$startIndex = $i;
+			$i = $endIndex;
+			// Skip if there's only one token in this ruleset
+			if ($endIndex - $startIndex <= 2) { continue; }
+			// Ensure that everything between the start and end is a declaration token, for safety
+			for ($ii = $startIndex + 1; $ii < $endIndex; $ii++)
+				{
+				if (get_class($tokens[$ii]) !== "CssRulesetDeclarationToken") { continue(2); }
+				}
+			$declarations = array_slice($tokens, $startIndex + 1, $endIndex - $startIndex - 1);
+			// Check whether a sort is required
+			$sortRequired = $lastPropertyName = false;
+			foreach ($declarations as $declaration)	
+				{
+				if ($lastPropertyName)
+					{
+					if (strcmp($lastPropertyName, $declaration->Property) > 0)
+						{
+						$sortRequired = true;
+						break;
+						}
+					}
+				$lastPropertyName = $declaration->Property;
+				}
+			if (!$sortRequired) { continue; }
+			// Arrange the declarations alphabetically by name
+			usort($declarations, array(__CLASS__, "userDefinedSort1"));
+			// Update "IsLast" property
+			for ($ii = 0, $ll = count($declarations) - 1; $ii <= $ll; $ii++)
+				{
+				if ($ii == $ll)
+					{
+					$declarations[$ii]->IsLast = true;
+					}
+				else
+					{
+					$declarations[$ii]->IsLast = false;
+					}
+				}
+			// Splice back into the array.
+			array_splice($tokens, $startIndex + 1, $endIndex - $startIndex - 1, $declarations);
+			$r += $endIndex - $startIndex - 1;
+			}
+		return $r;
+		}
+	/**
+	 * User defined sort function.
+	 * 
+	 * @return integer
+	 */
+	public static function userDefinedSort1($a, $b)
+		{
+		return strcmp($a->Property, $b->Property);
+		}
+	}
+
+/**
  * This {@link aCssToken CSS token} represents the start of a ruleset.
  * 
  * @package		CssMin/Tokens
@@ -914,7 +1004,7 @@ class CssStringParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssRulesetStartToken extends aCssRulesetStartToken
 	{
@@ -956,7 +1046,7 @@ class CssRulesetStartToken extends aCssRulesetStartToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssRulesetParserPlugin extends aCssParserPlugin
 	{
@@ -1032,7 +1122,7 @@ class CssRulesetParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			trigger_error(new CssError(__METHOD__ . ": Unterminated declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Unterminated declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"));
 			}
 		// End of declaration
 		elseif (($char === ";" || $char === "}") && $state === "T_RULESET_DECLARATION")
@@ -1082,7 +1172,7 @@ class CssRulesetParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssRulesetEndToken extends aCssRulesetEndToken
 	{
@@ -1097,7 +1187,7 @@ class CssRulesetEndToken extends aCssRulesetEndToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssRulesetDeclarationToken extends aCssDeclarationToken
 	{
@@ -1134,7 +1224,7 @@ class CssRulesetDeclarationToken extends aCssDeclarationToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssRemoveLastDelarationSemiColonMinifierFilter extends aCssMinifierFilter
 	{
@@ -1170,7 +1260,7 @@ class CssRemoveLastDelarationSemiColonMinifierFilter extends aCssMinifierFilter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssRemoveEmptyRulesetsMinifierFilter extends aCssMinifierFilter
 	{
@@ -1210,7 +1300,7 @@ class CssRemoveEmptyRulesetsMinifierFilter extends aCssMinifierFilter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssRemoveEmptyAtBlocksMinifierFilter extends aCssMinifierFilter
 	{
@@ -1250,7 +1340,7 @@ class CssRemoveEmptyAtBlocksMinifierFilter extends aCssMinifierFilter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssRemoveCommentsMinifierFilter extends aCssMinifierFilter
 	{
@@ -1283,7 +1373,7 @@ class CssRemoveCommentsMinifierFilter extends aCssMinifierFilter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssParser
 	{
@@ -1374,7 +1464,7 @@ class CssParser
 					}
 				else
 					{
-					trigger_error(new CssError(__METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
+					CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"));
 					}
 				}
 			}
@@ -1549,10 +1639,17 @@ class CssParser
 			{
 			// Set the current Char
 			$c = $source[$i]; // Is faster than: $c = substr($source, $i, 1);
-			// Filter double whitespace characters
-			if (($c === " " || $c === "\t" || $c === "\n") && ($p === " " || $p === "\t" || $p === "\n") && $this->stateExclusive === false)
+			// Normalize and filter double whitespace characters
+			if ($exclusive === false)
 				{
-				continue;
+				if ($c === "\n" || $c === "\t")
+					{
+					$c = " ";
+					}
+				if ($c === " " && $p === " ")
+					{
+					continue;
+					}
 				}
 			$buffer .= $c;
 			// Extended processing only if the current char is a global trigger char
@@ -1702,7 +1799,7 @@ class CssParser
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssOtbsFormatter extends aCssFormatter
 	{
@@ -1805,7 +1902,7 @@ class CssOtbsFormatter extends aCssFormatter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssNullToken extends aCssToken
 	{
@@ -1828,7 +1925,7 @@ class CssNullToken extends aCssToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssMinifier
 	{
@@ -1897,7 +1994,7 @@ class CssMinifier
 					}
 				else
 					{
-					trigger_error(new CssError(__METHOD__ . ": The filter <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
+					CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The filter <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"));
 					}
 				}
 			}
@@ -1914,7 +2011,7 @@ class CssMinifier
 					}
 				else
 					{
-					trigger_error(new CssError(__METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
+					CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"));
 					}
 				}
 			}
@@ -2060,7 +2157,7 @@ class CssMinifier
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssMin
 	{
@@ -2071,7 +2168,19 @@ class CssMin
 	 */
 	private static $classIndex = array();
 	/**
-	 * @link http://goo.gl/JrW54 Autoload} function of CssMin.
+	 * Parse/minify errors
+	 * 
+	 * @var array
+	 */
+	private static $errors = array();
+	/**
+	 * Verbose output.
+	 * 
+	 * @var boolean
+	 */
+	private static $isVerbose = false;
+	/**
+	 * {@link http://goo.gl/JrW54 Autoload} function of CssMin.
 	 * 
 	 * @param string $class Name of the class
 	 * @return void
@@ -2084,50 +2193,22 @@ class CssMin
 			}
 		}
 	/**
-	 * Create a build version of CssMin.
+	 * Return errors
 	 * 
-	 * @param string $target Path including file name were the build version should be saved [optional]
-	 * @return string Minifed build version
+	 * @return array of {CssError}.
 	 */
-	public static function build($target = "")
+	public static function getErrors()
 		{
-		$files		= array();
-		$source		= "";
-		$comment	= "";
-		// Get all source files
-		$paths = array(dirname(__FILE__));
-		while (list($i, $path) = each($paths))
-			{
-			foreach (glob($path . "*", GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT) as $subDirectory)
-				{
-				$paths[] = $subDirectory;
-				}
-			foreach (glob($path . "*.php", 0) as $file)
-				{
-				$files[basename($file)] = $file;
-				}
-			}
-		krsort($files);
-		// Read the content of the source files and extract the main comment block
-		foreach ($files as $file)
-			{
-			if (basename($file) == "CssMin.php")
-				{
-				$comment = file_get_contents($file);;
-				preg_match("/\/\*.+\*\//sU", $comment, $m);
-				$comment = $m[0];
-				}
-			$source .= file_get_contents($file);
-			}
-		// Remove php delimiters
-		$source	= str_replace(array("", ""), "", $source);
-		// Add php delimiters and the main comment and save the file
-		$source = "\n" . $comment . $source . "";
-		if ($target && file_put_contents($target, $source) === false)
-			{
-			return false;
-			}
-		return $source;
+		return self::$errors;
+		}
+	/**
+	 * Returns if there were errors.
+	 * 
+	 * @return boolean
+	 */
+	public static function hasErrors()
+		{
+		return count(self::$errors) > 0;
 		}
 	/**
 	 * Initialises CssMin.
@@ -2187,6 +2268,7 @@ class CssMin
 	 */
 	public static function minify($source, array $filters = null, array $plugins = null)
 		{
+		self::$errors = array();
 		$minifier = new CssMinifier($source, $filters, $plugins);
 		return $minifier->getMinified();
 		}
@@ -2199,8 +2281,34 @@ class CssMin
 	 */
 	public static function parse($source, array $plugins = null)
 		{
+		self::$errors = array();
 		$parser = new CssParser($source, $plugins);
 		return $parser->getTokens();
+		}
+	/**
+	 * --
+	 * 
+	 * @param boolean $to
+	 * @return boolean
+	 */
+	public static function setVerbose($to)
+		{
+		self::$isVerbose = (boolean) $to;
+		return self::$isVerbose;
+		}
+	/**
+	 * --
+	 * 
+	 * @param CssError $error
+	 * @return void
+	 */
+	public static function triggerError(CssError $error)
+		{
+		self::$errors[] = $error;
+		if (self::$isVerbose)
+			{
+			trigger_error((string) $error, E_USER_WARNING);
+			}
 		}
 	}
 // Initialises CssMin
@@ -2215,7 +2323,7 @@ CssMin::initialise();
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssImportImportsMinifierFilter extends aCssMinifierFilter
 	{
@@ -2235,7 +2343,7 @@ class CssImportImportsMinifierFilter extends aCssMinifierFilter
 		{
 		if (!isset($this->configuration["BasePath"]) || !is_dir($this->configuration["BasePath"]))
 			{
-			trigger_error(new CssError(__METHOD__ . ": Base path <code>" . ($this->configuration["BasePath"] ? $this->configuration["BasePath"] : "null"). "</code> is not a directory"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Base path <code>" . ($this->configuration["BasePath"] ? $this->configuration["BasePath"] : "null"). "</code> is not a directory"));
 			return 0;
 			}
 		for ($i = 0, $l = count($tokens); $i < $l; $i++)
@@ -2246,12 +2354,12 @@ class CssImportImportsMinifierFilter extends aCssMinifierFilter
 				// Import file was not found/is not a file
 				if (!is_file($import))
 					{
-					trigger_error(new CssError(__METHOD__ . ": Import file <code>" . $import. "</code> was not found.", (string) $tokens[$i]), E_USER_WARNING);
+					CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Import file <code>" . $import. "</code> was not found.", (string) $tokens[$i]));
 					}
 				// Import file already imported; remove this @import at-rule to prevent recursions
 				elseif (in_array($import, $this->imported))
 					{
-					trigger_error(new CssError(__METHOD__ . ": Import file <code>" . $import. "</code> was already imported.", (string) $tokens[$i]), E_USER_WARNING);
+					CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Import file <code>" . $import. "</code> was already imported.", (string) $tokens[$i]));
 					$tokens[$i] = null;
 					}
 				else
@@ -2420,7 +2528,7 @@ class CssImportImportsMinifierFilter extends aCssMinifierFilter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssExpressionParserPlugin extends aCssParserPlugin
 	{
@@ -2503,10 +2611,22 @@ class CssExpressionParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssError
 	{
+	/**
+	 * File.
+	 * 
+	 * @var string
+	 */
+	public $File = "";
+	/**
+	 * Line.
+	 * 
+	 * @var integer
+	 */
+	public $Line = 0;
 	/**
 	 * Error message.
 	 * 
@@ -2526,8 +2646,10 @@ class CssError
 	 * @param string $source Corresponding line [optional]
 	 * @return void
 	 */
-	public function __construct($message, $source = "")
+	public function __construct($file, $line, $message, $source = "")
 		{
+		$this->File		= $file;
+		$this->Line		= $line;
 		$this->Message	= $message;
 		$this->Source	= $source;
 		}
@@ -2538,7 +2660,7 @@ class CssError
 	 */	
 	public function __toString()
 		{
-		return $this->Message . ($this->Source ? ":<p><code>" . $this->Source . "</code></p>": "");
+		return $this->Message . ($this->Source ? ": <br /><code>" . $this->Source . "</code>": "") . "<br />in file " . $this->File . " at line " . $this->Line;
 		}
 	}
 
@@ -2560,7 +2682,7 @@ class CssError
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssConvertRgbColorsMinifierPlugin extends aCssMinifierPlugin
 	{
@@ -2629,7 +2751,7 @@ class CssConvertRgbColorsMinifierPlugin extends aCssMinifierPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssConvertNamedColorsMinifierPlugin extends aCssMinifierPlugin
 	{
@@ -2851,7 +2973,7 @@ class CssConvertNamedColorsMinifierPlugin extends aCssMinifierPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
 	{
@@ -3190,7 +3312,7 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssConvertLevel3AtKeyframesMinifierFilter extends aCssMinifierFilter
 	{
@@ -3198,12 +3320,12 @@ class CssConvertLevel3AtKeyframesMinifierFilter extends aCssMinifierFilter
 	 * Implements {@link aCssMinifierFilter::filter()}.
 	 * 
 	 * @param array $tokens Array of objects of type aCssToken
-	 * @return integer Count of added, changed or removed tokens; a return value large than 0 will rebuild the array
+	 * @return integer Count of added, changed or removed tokens; a return value larger than 0 will rebuild the array
 	 */
 	public function apply(array &$tokens)
 		{
 		$r = 0;
-		$transformations = array("-webkit-keyframes");
+		$transformations = array("-moz-keyframes", "-webkit-keyframes");
 		for ($i = 0, $l = count($tokens); $i < $l; $i++)
 			{
 			if (get_class($tokens[$i]) === "CssAtKeyframesStartToken")
@@ -3225,13 +3347,17 @@ class CssConvertLevel3AtKeyframesMinifierFilter extends aCssMinifierFilter
 						}
 					foreach ($transformations as $transformation)
 						{
-						$t = $source;
+						$t = array();
+						foreach ($source as $token)
+							{
+							$t[] = clone($token);
+							}
 						$t[0]->AtRuleName = $transformation;
 						$add = array_merge($add, $t);
 						}
 					if (isset($this->configuration["RemoveSource"]) && $this->configuration["RemoveSource"] === true)
 						{
-						array_splice($tokens, $i, $ii - $i, $add);
+						array_splice($tokens, $i, $ii - $i + 1, $add);
 						}
 					else
 						{
@@ -3265,7 +3391,7 @@ class CssConvertLevel3AtKeyframesMinifierFilter extends aCssMinifierFilter
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssConvertHslColorsMinifierPlugin extends aCssMinifierPlugin
 	{
@@ -3395,7 +3521,7 @@ class CssConvertHslColorsMinifierPlugin extends aCssMinifierPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssConvertFontWeightMinifierPlugin extends aCssMinifierPlugin
 	{
@@ -3500,7 +3626,7 @@ class CssConvertFontWeightMinifierPlugin extends aCssMinifierPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssCompressUnitValuesMinifierPlugin extends aCssMinifierPlugin
 	{
@@ -3565,7 +3691,7 @@ class CssCompressUnitValuesMinifierPlugin extends aCssMinifierPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssCompressExpressionValuesMinifierPlugin extends aCssMinifierPlugin
 	{
@@ -3621,7 +3747,7 @@ class CssCompressExpressionValuesMinifierPlugin extends aCssMinifierPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssCompressColorValuesMinifierPlugin extends aCssMinifierPlugin
 	{
@@ -3673,7 +3799,7 @@ class CssCompressColorValuesMinifierPlugin extends aCssMinifierPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssCommentToken extends aCssToken
 	{
@@ -3714,7 +3840,7 @@ class CssCommentToken extends aCssToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssCommentParserPlugin extends aCssParserPlugin
 	{
@@ -3781,7 +3907,7 @@ class CssCommentParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtVariablesStartToken extends aCssAtBlockStartToken
 	{
@@ -3823,7 +3949,7 @@ class CssAtVariablesStartToken extends aCssAtBlockStartToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtVariablesParserPlugin extends aCssParserPlugin
 	{
@@ -3883,7 +4009,7 @@ class CssAtVariablesParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			trigger_error(new CssError(__METHOD__ . ": Unterminated @variables declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Unterminated @variables declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"));
 			}
 		// End of @variables declaration
 		elseif (($char === ";" || $char === "}") && $state === "T_AT_VARIABLES_DECLARATION")
@@ -3925,7 +4051,7 @@ class CssAtVariablesParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtVariablesEndToken extends aCssAtBlockEndToken
 	{
@@ -3948,7 +4074,7 @@ class CssAtVariablesEndToken extends aCssAtBlockEndToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtVariablesDeclarationToken extends aCssDeclarationToken
 	{
@@ -3971,7 +4097,7 @@ class CssAtVariablesDeclarationToken extends aCssDeclarationToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtPageStartToken extends aCssAtBlockStartToken
 	{
@@ -4013,7 +4139,7 @@ class CssAtPageStartToken extends aCssAtBlockStartToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtPageParserPlugin extends aCssParserPlugin
 	{
@@ -4074,7 +4200,7 @@ class CssAtPageParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			trigger_error(new CssError(__METHOD__ . ": Unterminated @page declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Unterminated @page declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"));
 			}
 		// End of @page declaration
 		elseif (($char === ";" || $char === "}") && $state == "T_AT_PAGE_DECLARATION")
@@ -4122,7 +4248,7 @@ class CssAtPageParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtPageEndToken extends aCssAtBlockEndToken
 	{
@@ -4137,7 +4263,7 @@ class CssAtPageEndToken extends aCssAtBlockEndToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtPageDeclarationToken extends aCssDeclarationToken
 	{
@@ -4152,7 +4278,7 @@ class CssAtPageDeclarationToken extends aCssDeclarationToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtMediaStartToken extends aCssAtBlockStartToken
 	{
@@ -4189,7 +4315,7 @@ class CssAtMediaStartToken extends aCssAtBlockStartToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtMediaParserPlugin extends aCssParserPlugin
 	{
@@ -4257,7 +4383,7 @@ class CssAtMediaParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtMediaEndToken extends aCssAtBlockEndToken
 	{
@@ -4272,7 +4398,7 @@ class CssAtMediaEndToken extends aCssAtBlockEndToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtKeyframesStartToken extends aCssAtBlockStartToken
 	{
@@ -4294,9 +4420,13 @@ class CssAtKeyframesStartToken extends aCssAtBlockStartToken
 	 * @param string $selector Selector
 	 * @return void
 	 */
-	public function __construct($name)
+	public function __construct($name, $atRuleName = null)
 		{
 		$this->Name = $name;
+		if (!is_null($atRuleName))
+			{
+			$this->AtRuleName = $atRuleName;
+			}
 		}
 	/**
 	 * Implements {@link aCssToken::__toString()}.
@@ -4317,7 +4447,7 @@ class CssAtKeyframesStartToken extends aCssAtBlockStartToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtKeyframesRulesetStartToken extends aCssRulesetStartToken
 	{
@@ -4356,7 +4486,7 @@ class CssAtKeyframesRulesetStartToken extends aCssRulesetStartToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtKeyframesRulesetEndToken extends aCssRulesetEndToken
 	{
@@ -4371,7 +4501,7 @@ class CssAtKeyframesRulesetEndToken extends aCssRulesetEndToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtKeyframesRulesetDeclarationToken extends aCssDeclarationToken
 	{
@@ -4386,10 +4516,14 @@ class CssAtKeyframesRulesetDeclarationToken extends aCssDeclarationToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtKeyframesParserPlugin extends aCssParserPlugin
 	{
+	/**
+	 * @var string Keyword
+	 */
+	private $atRuleName = "";
 	/**
 	 * Selectors.
 	 * 
@@ -4425,11 +4559,28 @@ class CssAtKeyframesParserPlugin extends aCssParserPlugin
 	public function parse($index, $char, $previousChar, $state)
 		{
 		// Start of @keyframes at-rule block
-		if ($char === "@" && $state === "T_DOCUMENT" && strtolower(substr($this->parser->getSource(), $index, 10)) === "@keyframes")
+		if ($char === "@" && $state === "T_DOCUMENT" && strtolower(substr($this->parser->getSource(), $index, 10)) === "@keyframes") 
 			{
+			$this->atRuleName = "keyframes";
 			$this->parser->pushState("T_AT_KEYFRAMES::NAME");
 			$this->parser->clearBuffer();
 			return $index + 10;
+			}
+		// Start of @keyframes at-rule block (@-moz-keyframes)
+		elseif ($char === "@" && $state === "T_DOCUMENT" && strtolower(substr($this->parser->getSource(), $index, 15)) === "@-moz-keyframes")
+			{
+			$this->atRuleName = "-moz-keyframes";
+			$this->parser->pushState("T_AT_KEYFRAMES::NAME");
+			$this->parser->clearBuffer();
+			return $index + 15;
+			}
+		// Start of @keyframes at-rule block (@-webkit-keyframes)
+		elseif ($char === "@" && $state === "T_DOCUMENT" && strtolower(substr($this->parser->getSource(), $index, 18)) === "@-webkit-keyframes")
+			{
+			$this->atRuleName = "-webkit-keyframes";
+			$this->parser->pushState("T_AT_KEYFRAMES::NAME");
+			$this->parser->clearBuffer();
+			return $index + 18;
 			}
 		// Start of @keyframes rulesets
 		elseif ($char === "{" && $state === "T_AT_KEYFRAMES::NAME")
@@ -4437,7 +4588,7 @@ class CssAtKeyframesParserPlugin extends aCssParserPlugin
 			$name = $this->parser->getAndClearBuffer("{\"'");
 			$this->parser->setState("T_AT_KEYFRAMES_RULESETS");
 			$this->parser->clearBuffer();
-			$this->parser->appendToken(new CssAtKeyframesStartToken($name));
+			$this->parser->appendToken(new CssAtKeyframesStartToken($name, $this->atRuleName));
 			}
 		// Start of @keyframe ruleset and selectors
 		if ($char === "," && $state === "T_AT_KEYFRAMES_RULESETS")
@@ -4469,7 +4620,7 @@ class CssAtKeyframesParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			trigger_error(new CssError(__METHOD__ . ": Unterminated @keyframes ruleset declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Unterminated @keyframes ruleset declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"));
 			}
 		// End of declaration
 		elseif (($char === ";" || $char === "}") && $state === "T_AT_KEYFRAMES_RULESET_DECLARATION")
@@ -4525,7 +4676,7 @@ class CssAtKeyframesParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtKeyframesEndToken extends aCssAtBlockEndToken
 	{
@@ -4540,7 +4691,7 @@ class CssAtKeyframesEndToken extends aCssAtBlockEndToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0.b1 (2001-02-22)
+ * @version		3.0.1.b1 (2001-02-22)
  */
 class CssAtImportToken extends aCssToken
 	{
@@ -4589,7 +4740,7 @@ class CssAtImportToken extends aCssToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtImportParserPlugin extends aCssParserPlugin
 	{
@@ -4651,7 +4802,7 @@ class CssAtImportParserPlugin extends aCssParserPlugin
 				}
 			else
 				{
-				trigger_error(new CssError(__METHOD__ . ": Invalid @import at-rule syntax", $this->parser->buffer), E_USER_WARNING);
+				CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Invalid @import at-rule syntax", $this->parser->buffer));
 				}
 			$this->parser->popState();
 			}
@@ -4671,7 +4822,7 @@ class CssAtImportParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtFontFaceStartToken extends aCssAtBlockStartToken
 	{
@@ -4697,7 +4848,7 @@ class CssAtFontFaceStartToken extends aCssAtBlockStartToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtFontFaceParserPlugin extends aCssParserPlugin
 	{
@@ -4757,7 +4908,7 @@ class CssAtFontFaceParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			trigger_error(new CssError(__METHOD__ . ": Unterminated @font-face declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Unterminated @font-face declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"));
 			}
 		// End of @font-face declaration
 		elseif (($char === ";" || $char === "}") && $state === "T_AT_FONT_FACE_DECLARATION")
@@ -4805,7 +4956,7 @@ class CssAtFontFaceParserPlugin extends aCssParserPlugin
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtFontFaceEndToken extends aCssAtBlockEndToken
 	{
@@ -4820,7 +4971,7 @@ class CssAtFontFaceEndToken extends aCssAtBlockEndToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtFontFaceDeclarationToken extends aCssDeclarationToken
 	{
@@ -4835,7 +4986,7 @@ class CssAtFontFaceDeclarationToken extends aCssDeclarationToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtCharsetToken extends aCssToken
 	{
@@ -4876,7 +5027,7 @@ class CssAtCharsetToken extends aCssToken
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtCharsetParserPlugin extends aCssParserPlugin
 	{
@@ -4927,4 +5078,5 @@ class CssAtCharsetParserPlugin extends aCssParserPlugin
 		return true;
 		}
 	}
+
 ?>

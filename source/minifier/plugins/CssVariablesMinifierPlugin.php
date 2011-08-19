@@ -24,7 +24,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 	{
@@ -77,7 +77,7 @@ class CssVariablesMinifierPlugin extends aCssMinifierPlugin
 						}
 					}
 				// If no value was found trigger an error and replace the token with a CssNullToken
-				trigger_error(new CssError(__METHOD__ . ": No value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token), E_USER_WARNING);
+				CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": No value found for variable <code>" . $variable . "</code> in media types <code>" . implode(", ", $mediaTypes) . "</code>", (string) $token));
 				$token = new CssNullToken();
 				return true;
 				}

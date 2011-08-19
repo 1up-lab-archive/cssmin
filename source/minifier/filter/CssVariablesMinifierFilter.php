@@ -9,7 +9,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssVariablesMinifierFilter extends aCssMinifierFilter
 	{
@@ -83,7 +83,7 @@ class CssVariablesMinifierFilter extends aCssMinifierFilter
 			}
 		if (!($plugin = $this->minifier->getPlugin("CssVariablesMinifierPlugin")))
 			{
-			trigger_error(new CssError(__METHOD__ . ": The plugin <code>CssVariablesMinifierPlugin</code> was not found but is required for <code>" . __CLASS__ . "</code>"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The plugin <code>CssVariablesMinifierPlugin</code> was not found but is required for <code>" . __CLASS__ . "</code>"));
 			}
 		else
 			{

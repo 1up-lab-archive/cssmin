@@ -10,7 +10,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtFontFaceParserPlugin extends aCssParserPlugin
 	{
@@ -70,7 +70,7 @@ class CssAtFontFaceParserPlugin extends aCssParserPlugin
 				{
 				return false;
 				}
-			trigger_error(new CssError(__METHOD__ . ": Unterminated @font-face declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Unterminated @font-face declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"));
 			}
 		// End of @font-face declaration
 		elseif (($char === ";" || $char === "}") && $state === "T_AT_FONT_FACE_DECLARATION")

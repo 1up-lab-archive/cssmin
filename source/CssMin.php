@@ -29,7 +29,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssMin
 	{
@@ -40,7 +40,19 @@ class CssMin
 	 */
 	private static $classIndex = array();
 	/**
-	 * @link http://goo.gl/JrW54 Autoload} function of CssMin.
+	 * Parse/minify errors
+	 * 
+	 * @var array
+	 */
+	private static $errors = array();
+	/**
+	 * Verbose output.
+	 * 
+	 * @var boolean
+	 */
+	private static $isVerbose = false;
+	/**
+	 * {@link http://goo.gl/JrW54 Autoload} function of CssMin.
 	 * 
 	 * @param string $class Name of the class
 	 * @return void
@@ -53,50 +65,22 @@ class CssMin
 			}
 		}
 	/**
-	 * Create a build version of CssMin.
+	 * Return errors
 	 * 
-	 * @param string $target Path including file name were the build version should be saved [optional]
-	 * @return string Minifed build version
+	 * @return array of {CssError}.
 	 */
-	public static function build($target = "")
+	public static function getErrors()
 		{
-		$files		= array();
-		$source		= "";
-		$comment	= "";
-		// Get all source files
-		$paths = array(dirname(__FILE__));
-		while (list($i, $path) = each($paths))
-			{
-			foreach (glob($path . "*", GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT) as $subDirectory)
-				{
-				$paths[] = $subDirectory;
-				}
-			foreach (glob($path . "*.php", 0) as $file)
-				{
-				$files[basename($file)] = $file;
-				}
-			}
-		krsort($files);
-		// Read the content of the source files and extract the main comment block
-		foreach ($files as $file)
-			{
-			if (basename($file) == "CssMin.php")
-				{
-				$comment = file_get_contents($file);;
-				preg_match("/\/\*.+\*\//sU", $comment, $m);
-				$comment = $m[0];
-				}
-			$source .= file_get_contents($file);
-			}
-		// Remove php delimiters
-		$source	= str_replace(array("<?php", "?>"), "", $source);
-		// Add php delimiters and the main comment and save the file
-		$source = "<?php\n" . $comment . $source . "?>";
-		if ($target && file_put_contents($target, $source) === false)
-			{
-			return false;
-			}
-		return $source;
+		return self::$errors;
+		}
+	/**
+	 * Returns if there were errors.
+	 * 
+	 * @return boolean
+	 */
+	public static function hasErrors()
+		{
+		return count(self::$errors) > 0;
 		}
 	/**
 	 * Initialises CssMin.
@@ -156,6 +140,7 @@ class CssMin
 	 */
 	public static function minify($source, array $filters = null, array $plugins = null)
 		{
+		self::$errors = array();
 		$minifier = new CssMinifier($source, $filters, $plugins);
 		return $minifier->getMinified();
 		}
@@ -168,8 +153,34 @@ class CssMin
 	 */
 	public static function parse($source, array $plugins = null)
 		{
+		self::$errors = array();
 		$parser = new CssParser($source, $plugins);
 		return $parser->getTokens();
+		}
+	/**
+	 * --
+	 * 
+	 * @param boolean $to
+	 * @return boolean
+	 */
+	public static function setVerbose($to)
+		{
+		self::$isVerbose = (boolean) $to;
+		return self::$isVerbose;
+		}
+	/**
+	 * --
+	 * 
+	 * @param CssError $error
+	 * @return void
+	 */
+	public static function triggerError(CssError $error)
+		{
+		self::$errors[] = $error;
+		if (self::$isVerbose)
+			{
+			trigger_error((string) $error, E_USER_WARNING);
+			}
 		}
 	}
 // Initialises CssMin

@@ -7,7 +7,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssParser
 	{
@@ -98,7 +98,7 @@ class CssParser
 					}
 				else
 					{
-					trigger_error(new CssError(__METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"), E_USER_WARNING);
+					CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"));
 					}
 				}
 			}
@@ -273,10 +273,17 @@ class CssParser
 			{
 			// Set the current Char
 			$c = $source[$i]; // Is faster than: $c = substr($source, $i, 1);
-			// Filter double whitespace characters
-			if (($c === " " || $c === "\t" || $c === "\n") && ($p === " " || $p === "\t" || $p === "\n") && $this->stateExclusive === false)
+			// Normalize and filter double whitespace characters
+			if ($exclusive === false)
 				{
-				continue;
+				if ($c === "\n" || $c === "\t")
+					{
+					$c = " ";
+					}
+				if ($c === " " && $p === " ")
+					{
+					continue;
+					}
 				}
 			$buffer .= $c;
 			// Extended processing only if the current char is a global trigger char

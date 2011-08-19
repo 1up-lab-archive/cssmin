@@ -7,7 +7,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssAtKeyframesStartToken extends aCssAtBlockStartToken
 	{
@@ -29,9 +29,13 @@ class CssAtKeyframesStartToken extends aCssAtBlockStartToken
 	 * @param string $selector Selector
 	 * @return void
 	 */
-	public function __construct($name)
+	public function __construct($name, $atRuleName = null)
 		{
 		$this->Name = $name;
+		if (!is_null($atRuleName))
+			{
+			$this->AtRuleName = $atRuleName;
+			}
 		}
 	/**
 	 * Implements {@link aCssToken::__toString()}.

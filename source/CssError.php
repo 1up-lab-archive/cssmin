@@ -7,10 +7,22 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssError
 	{
+	/**
+	 * File.
+	 * 
+	 * @var string
+	 */
+	public $File = "";
+	/**
+	 * Line.
+	 * 
+	 * @var integer
+	 */
+	public $Line = 0;
 	/**
 	 * Error message.
 	 * 
@@ -30,8 +42,10 @@ class CssError
 	 * @param string $source Corresponding line [optional]
 	 * @return void
 	 */
-	public function __construct($message, $source = "")
+	public function __construct($file, $line, $message, $source = "")
 		{
+		$this->File		= $file;
+		$this->Line		= $line;
 		$this->Message	= $message;
 		$this->Source	= $source;
 		}
@@ -42,7 +56,7 @@ class CssError
 	 */	
 	public function __toString()
 		{
-		return $this->Message . ($this->Source ? ":<p><code>" . $this->Source . "</code></p>": "");
+		return $this->Message . ($this->Source ? ": <br /><code>" . $this->Source . "</code>": "") . "<br />in file " . $this->File . " at line " . $this->Line;
 		}
 	}
 ?>

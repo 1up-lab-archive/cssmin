@@ -9,7 +9,7 @@
  * @author		Joe Scylla <joe.scylla@gmail.com>
  * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
  * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.0
+ * @version		3.0.1
  */
 class CssUrlParserPlugin extends aCssParserPlugin
 	{
@@ -59,7 +59,7 @@ class CssUrlParserPlugin extends aCssParserPlugin
 			$this->parser->setBuffer(substr($this->parser->getBuffer(), 0, -1) . ")"); // Replace the LF with the url string delimiter
 			$this->parser->popState();
 			$this->parser->unsetExclusive();
-			trigger_error(new CssError(__METHOD__ . ": Unterminated string literal", $line . "_"), E_USER_WARNING);
+			CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Unterminated string literal", $line . "_"));
 			}
 		// End of string
 		elseif ($char === ")" && $state === "T_URL")
