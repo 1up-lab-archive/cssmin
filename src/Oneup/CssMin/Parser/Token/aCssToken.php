@@ -1,7 +1,7 @@
 <?php
 /**
  * Abstract definition of a CSS token class.
- * 
+ *
  * Every token has to extend this class.
  *
  * @package		CssMin/Tokens
@@ -12,12 +12,11 @@
  * @version		3.0.1
  */
 abstract class aCssToken
-	{
-	/**
-	 * Returns the token as string.
-	 * 
-	 * @return string
-	 */
-	abstract public function __toString();
-	}
-?>
+    {
+    /**
+     * Returns the token as string.
+     *
+     * @return string
+     */
+    abstract public function __toString();
+    }

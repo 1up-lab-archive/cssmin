@@ -10,15 +10,14 @@
  * @version		3.0.1
  */
 class CssAtVariablesEndToken extends aCssAtBlockEndToken
-	{
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return "";
-		}
-	}
-?>
+    {
+    /**
+     * Implements {@link aCssToken::__toString()}.
+     *
+     * @return string
+     */
+    public function __toString()
+        {
+        return "";
+        }
+    }

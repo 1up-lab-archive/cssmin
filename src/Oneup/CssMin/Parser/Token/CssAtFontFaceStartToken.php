@@ -10,15 +10,14 @@
  * @version		3.0.1
  */
 class CssAtFontFaceStartToken extends aCssAtBlockStartToken
-	{
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return "@font-face{";
-		}
-	}
-?>
+    {
+    /**
+     * Implements {@link aCssToken::__toString()}.
+     *
+     * @return string
+     */
+    public function __toString()
+        {
+        return "@font-face{";
+        }
+    }

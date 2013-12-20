@@ -10,7 +10,6 @@
  * @version		3.0.1
  */
 class CssAtKeyframesRulesetDeclarationToken extends aCssDeclarationToken
-	{
-	
-	}
-?>
+    {
+
+    }

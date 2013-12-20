@@ -10,7 +10,6 @@
  * @version		3.0.1
  */
 abstract class aCssRulesetStartToken extends aCssToken
-	{
-	
-	}
-?>
+    {
+
+    }

@@ -10,15 +10,14 @@
  * @version		3.0.1
  */
 class CssNullToken extends aCssToken
-	{
-	/**
-	 * Implements {@link aCssToken::__toString()}.
-	 * 
-	 * @return string
-	 */
-	public function __toString()
-		{
-		return "";
-		}
-	}
-?>
+    {
+    /**
+     * Implements {@link aCssToken::__toString()}.
+     *
+     * @return string
+     */
+    public function __toString()
+        {
+        return "";
+        }
+    }
