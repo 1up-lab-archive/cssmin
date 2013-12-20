@@ -1,0 +1,28 @@
+{
+    "name": "oneup/cssmin",
+    "description": "CSS minifier from Joe Scylla made ready for the present days.",
+    "keywords": ["css", "minifier"],
+    "homepage": "http://1up.io",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jim Schmid",
+            "email": "js@1up.io"
+        },
+        {
+            "name": "David Greminger",
+            "email": "dg@1up.io"
+        }
+    ],
+    "require": {
+        "php": ">=5.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~3.7"
+    },
+    "autoload": {
+        "psr-0": { "Oneup\\CssMin": ""}
+    },
+    "target-dir": "Oneup/CssMin"
+}
