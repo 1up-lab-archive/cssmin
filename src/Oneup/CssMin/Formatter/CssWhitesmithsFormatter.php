@@ -1,6 +1,6 @@
 <?php
 
-namespace Oneup\CssMin;
+namespace Oneup\CssMin\Formatter;
 
 class CssWhitesmithsFormatter extends aCssFormatter
 {
