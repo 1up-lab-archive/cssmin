@@ -1,64 +1,65 @@
 <?php
-/**
- * CSS Parser.
- *
- * @package		CssMin/Parser
- * @link		http://code.google.com/p/cssmin/
- * @author		Joe Scylla <joe.scylla@gmail.com>
- * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.1
- */
+
+namespace Oneup\CssMin\Parser;
+
 class CssParser
-    {
+{
     /**
      * Parse buffer.
      *
      * @var string
      */
     private $buffer = "";
+
     /**
      * {@link aCssParserPlugin Plugins}.
      *
      * @var array
      */
     private $plugins = array();
+
     /**
      * Source to parse.
      *
      * @var string
      */
     private $source = "";
+
     /**
      * Current state.
      *
      * @var integer
      */
     private $state = "T_DOCUMENT";
+
     /**
      * Exclusive state.
      *
      * @var string
      */
     private $stateExclusive = false;
+
     /**
      * Media types state.
      *
      * @var mixed
      */
     private $stateMediaTypes = false;
+
     /**
      * State stack.
      *
      * @var array
      */
     private $states = array("T_DOCUMENT");
+
     /**
      * Parsed tokens.
      *
      * @var array
      */
     private $tokens = array();
+
     /**
      * Constructer.
      *
@@ -69,9 +70,8 @@ class CssParser
      * @return void
      */
     public function __construct($source = null, array $plugins = null)
-        {
-        $plugins = array_merge(array
-            (
+    {
+        $plugins = array_merge(array (
             "Comment"		=> true,
             "String"		=> true,
             "Url"			=> true,
@@ -84,7 +84,8 @@ class CssParser
             "AtMedia"		=> true,
             "AtPage"		=> true,
             "AtVariables"	=> true
-            ), is_array($plugins) ? $plugins : array());
+        ), is_array($plugins) ? $plugins : array());
+
         // Create plugin instances
         foreach ($plugins as $name => $config) {
             if ($config !== false) {
@@ -92,15 +93,16 @@ class CssParser
                 $config = is_array($config) ? $config : array();
                 if (class_exists($class)) {
                     $this->plugins[] = new $class($this, $config);
-                    } else {
+                } else {
                     CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"));
-                    }
                 }
             }
+        }
         if (!is_null($source)) {
             $this->parse($source);
-            }
         }
+    }
+
     /**
      * Append a token to the array of tokens.
      *
@@ -108,18 +110,20 @@ class CssParser
      * @return void
      */
     public function appendToken(aCssToken $token)
-        {
+    {
         $this->tokens[] = $token;
-        }
+    }
+
     /**
      * Clears the current buffer.
      *
      * @return void
      */
     public function clearBuffer()
-        {
+    {
         $this->buffer = "";
-        }
+    }
+
     /**
      * Returns and clear the current buffer.
      *
@@ -128,12 +132,13 @@ class CssParser
      * @return string
      */
     public function getAndClearBuffer($trim = "", $tolower = false)
-        {
+    {
         $r = $this->getBuffer($trim, $tolower);
         $this->buffer = "";
 
         return $r;
-        }
+    }
+
     /**
      * Returns the current buffer.
      *
@@ -142,44 +147,48 @@ class CssParser
      * @return string
      */
     public function getBuffer($trim = "", $tolower = false)
-        {
+    {
         $r = $this->buffer;
         if ($trim) {
             $r = trim($r, " \t\n\r\0\x0B" . $trim);
-            }
+        }
         if ($tolower) {
             $r = strtolower($r);
-            }
+        }
 
         return $r;
-        }
+    }
+
     /**
      * Returns the current media types state.
      *
      * @return array
      */
     public function getMediaTypes()
-        {
+    {
         return $this->stateMediaTypes;
-        }
+    }
+
     /**
      * Returns the CSS source.
      *
      * @return string
      */
     public function getSource()
-        {
+    {
         return $this->source;
-        }
+    }
+
     /**
      * Returns the current state.
      *
      * @return integer The current state
      */
     public function getState()
-        {
+    {
         return $this->state;
-        }
+    }
+
     /**
      * Returns a plugin by class name.
      *
@@ -187,26 +196,28 @@ class CssParser
      * @return aCssParserPlugin
      */
     public function getPlugin($class)
-        {
+    {
         static $index = null;
         if (is_null($index)) {
             $index = array();
             for ($i = 0, $l = count($this->plugins); $i < $l; $i++) {
                 $index[get_class($this->plugins[$i])] = $i;
-                }
             }
+        }
 
         return isset($index[$class]) ? $this->plugins[$index[$class]] : false;
-        }
+    }
+
     /**
      * Returns the parsed tokens.
      *
      * @return array
      */
     public function getTokens()
-        {
+    {
         return $this->tokens;
-        }
+    }
+
     /**
      * Returns if the current state equals the passed state.
      *
@@ -214,9 +225,10 @@ class CssParser
      * @return boolean TRUE is the state equals to the passed state; FALSE if not
      */
     public function isState($state)
-        {
+    {
         return ($this->state == $state);
-        }
+    }
+
     /**
      * Parse the CSS source and return a array with parsed tokens.
      *
@@ -224,7 +236,7 @@ class CssParser
      * @return array  Array with tokens
      */
     public function parse($source)
-        {
+    {
         // Reset
         $this->source = "";
         $this->tokens = array();
@@ -246,9 +258,9 @@ class CssParser
                 $c = substr($pluginTriggerChars[$i], $ii, 1);
                 if (strpos($globalTriggerChars, $c) === false) {
                     $globalTriggerChars .= $c;
-                    }
                 }
             }
+        }
         // Normalise line endings
         $source			= str_replace("\r\n", "\n", $source);	// Windows to Unix line endings
         $source			= str_replace("\r", "\n", $source);		// Mac to Unix line endings
@@ -266,11 +278,11 @@ class CssParser
             if ($exclusive === false) {
                 if ($c === "\n" || $c === "\t") {
                     $c = " ";
-                    }
+                }
                 if ($c === " " && $p === " ") {
                     continue;
-                    }
                 }
+            }
             $buffer .= $c;
             // Extended processing only if the current char is a global trigger char
             if (strpos($globalTriggerChars, $c) !== false) {
@@ -282,14 +294,14 @@ class CssParser
                         // Return value is TRUE => continue with next char
                         if ($r === true) {
                             continue;
-                            }
+                        }
                         // Return value is numeric => set new index and continue with next char
                         elseif ($r !== false && $r != $i) {
                             $i = $r;
                             continue;
-                            }
                         }
                     }
+                }
                 // Else iterate through the plugins
                 else {
                     $triggerState = "|" . $state . "|";
@@ -301,33 +313,35 @@ class CssParser
                             // Return value is TRUE => break the plugin loop and and continue with next char
                             if ($r === true) {
                                 break;
-                                }
+                            }
                             // Return value is numeric => set new index, break the plugin loop and and continue with next char
                             elseif ($r !== false && $r != $i) {
                                 $i = $r;
                                 break;
-                                }
                             }
                         }
                     }
                 }
-            $p = $c; // Set the parent char
             }
+            $p = $c; // Set the parent char
+        }
 
         return $this->tokens;
-        }
+    }
+
     /**
      * Remove the last state of the state stack and return the removed stack value.
      *
      * @return integer Removed state value
      */
     public function popState()
-        {
+    {
         $r = array_pop($this->states);
         $this->state = $this->states[count($this->states) - 1];
 
         return $r;
-        }
+    }
+
     /**
      * Adds a new state onto the state stack.
      *
@@ -335,12 +349,13 @@ class CssParser
      * @return integer The index of the added state in the state stacks
      */
     public function pushState($state)
-        {
+    {
         $r = array_push($this->states, $state);
         $this->state = $this->states[count($this->states) - 1];
 
         return $r;
-        }
+    }
+
     /**
      * Sets/restores the buffer.
      *
@@ -348,9 +363,10 @@ class CssParser
      * @return void
      */
     public function setBuffer($buffer)
-        {
+    {
         $this->buffer = $buffer;
-        }
+    }
+
     /**
      * Set the exclusive state.
      *
@@ -358,9 +374,10 @@ class CssParser
      * @return void
      */
     public function setExclusive($exclusive)
-        {
+    {
         $this->stateExclusive = $exclusive;
-        }
+    }
+
     /**
      * Set the media types state.
      *
@@ -368,9 +385,10 @@ class CssParser
      * @return void
      */
     public function setMediaTypes(array $mediaTypes)
-        {
+    {
         $this->stateMediaTypes = $mediaTypes;
-        }
+    }
+
     /**
      * Sets the current state in the state stack; equals to {@link CssParser::popState()} + {@link CssParser::pushState()}.
      *
@@ -378,29 +396,31 @@ class CssParser
      * @return integer
      */
     public function setState($state)
-        {
+    {
         $r = array_pop($this->states);
         array_push($this->states, $state);
         $this->state = $this->states[count($this->states) - 1];
 
         return $r;
-        }
+    }
+
     /**
      * Removes the exclusive state.
      *
      * @return void
      */
     public function unsetExclusive()
-        {
+    {
         $this->stateExclusive = false;
-        }
+    }
+
     /**
      * Removes the media types state.
      *
      * @return void
      */
     public function unsetMediaTypes()
-        {
+    {
         $this->stateMediaTypes = false;
-        }
     }
+}

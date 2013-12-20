@@ -1,34 +1,30 @@
 <?php
-/**
- * CSS Minifier.
- *
- * @package		CssMin/Minifier
- * @link		http://code.google.com/p/cssmin/
- * @author		Joe Scylla <joe.scylla@gmail.com>
- * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.1
- */
+
+namespace Oneup\CssMin\Minifier;
+
 class CssMinifier
-    {
+{
     /**
      * {@link aCssMinifierFilter Filters}.
      *
      * @var array
      */
     private $filters = array();
+
     /**
      * {@link aCssMinifierPlugin Plugins}.
      *
      * @var array
      */
     private $plugins = array();
+
     /**
      * Minified source.
      *
      * @var string
      */
     private $minified = "";
+
     /**
      * Constructer.
      *
@@ -40,7 +36,7 @@ class CssMinifier
      * @return void
      */
     public function __construct($source = null, array $filters = null, array $plugins = null)
-        {
+    {
         $filters = array_merge(array
             (
             "ImportImports"					=> false,
@@ -70,11 +66,11 @@ class CssMinifier
                 $config = is_array($config) ? $config : array();
                 if (class_exists($class)) {
                     $this->filters[] = new $class($this, $config);
-                    } else {
+                } else {
                     CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The filter <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"));
-                    }
                 }
             }
+        }
         // Plugins
         foreach ($plugins as $name => $config) {
             if ($config !== false) {
@@ -82,25 +78,26 @@ class CssMinifier
                 $config = is_array($config) ? $config : array();
                 if (class_exists($class)) {
                     $this->plugins[] = new $class($this, $config);
-                    } else {
+                } else {
                     CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"));
-                    }
                 }
             }
+        }
         // --
         if (!is_null($source)) {
             $this->minify($source);
-            }
         }
+    }
+
     /**
      * Returns the minified Source.
      *
      * @return string
      */
     public function getMinified()
-        {
+    {
         return $this->minified;
-        }
+    }
     /**
      * Returns a plugin by class name.
      *
@@ -108,17 +105,18 @@ class CssMinifier
      * @return aCssMinifierPlugin
      */
     public function getPlugin($class)
-        {
+    {
         static $index = null;
         if (is_null($index)) {
             $index = array();
             for ($i = 0, $l = count($this->plugins); $i < $l; $i++) {
                 $index[get_class($this->plugins[$i])] = $i;
-                }
             }
+        }
 
         return isset($index[$class]) ? $this->plugins[$index[$class]] : false;
-        }
+    }
+
     /**
      * Minifies the CSS source.
      *
@@ -126,7 +124,7 @@ class CssMinifier
      * @return string
      */
     public function minify($source)
-        {
+    {
         // Variables
         $r						= "";
         $parser					= new CssParser($source);
@@ -144,11 +142,11 @@ class CssMinifier
             foreach ($pluginTriggerTokens[$i] as $v) {
                 if (!in_array($v, $globalTriggerTokens)) {
                     $globalTriggerTokens[] = $v;
-                    }
                 }
+            }
             $pluginTriggerTokens[$i] = "|" . implode("|", $pluginTriggerTokens[$i]) . "|";
             $pluginIndex[$tPluginClassName]	= $i;
-            }
+        }
         $globalTriggerTokens = "|" . implode("|", $globalTriggerTokens) . "|";
         /*
          * Apply filters
@@ -158,8 +156,8 @@ class CssMinifier
             if ($filters[$i]->apply($tokens) > 0) {
                 // ...then filter null values and rebuild the token array
                 $tokens = array_values(array_filter($tokens));
-                }
             }
+        }
         $tokenCount = count($tokens);
         /*
          * Apply plugins
@@ -172,17 +170,17 @@ class CssMinifier
                         // Apply the plugin; if the return value is TRUE continue to the next token
                         if ($plugins[$ii]->apply($tokens[$i]) === true) {
                             continue 2;
-                            }
                         }
                     }
                 }
             }
+        }
         // Stringify the tokens
         for ($i = 0; $i < $tokenCount; $i++) {
             $r .= (string) $tokens[$i];
-            }
+        }
         $this->minified = $r;
 
         return $r;
-        }
     }
+}

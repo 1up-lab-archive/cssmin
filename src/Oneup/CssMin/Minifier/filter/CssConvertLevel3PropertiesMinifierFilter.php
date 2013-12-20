@@ -1,25 +1,16 @@
 <?php
-/**
- * This {@link aCssMinifierFilter minifier filter} triggers on CSS Level 3 properties and will add declaration tokens
- * with browser-specific properties.
- *
- * @package		CssMin/Minifier/Filters
- * @link		http://code.google.com/p/cssmin/
- * @author		Joe Scylla <joe.scylla@gmail.com>
- * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.1
- */
+
+namespace Oneup\CssMin\Minifier\Filter;
+
 class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
-    {
+{
     /**
      * Css property transformations table. Used to convert CSS3 and proprietary properties to the browser-specific
      * counterparts.
      *
      * @var array
      */
-    private $transformations = array
-        (
+    private $transformations = array (
         // Property						Array(Mozilla, Webkit, Opera, Internet Explorer); NULL values are placeholders and will get ignored
         "animation"						=> array(null, "-webkit-animation", null, null),
         "animation-delay"				=> array(null, "-webkit-animation-delay", null, null),
@@ -222,7 +213,8 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
         "word-wrap"						=> array(null, null, null, "-ms-word-wrap"),
         "writing-mode"					=> array(null, "-webkit-writing-mode", null, "-ms-writing-mode"),
         "zoom"							=> array(null, null, null, "-ms-zoom")
-        );
+    );
+
     /**
      * Implements {@link aCssMinifierFilter::filter()}.
      *
@@ -230,7 +222,7 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
      * @return integer Count of added, changed or removed tokens; a return value large than 0 will rebuild the array
      */
     public function apply(array &$tokens)
-        {
+    {
         $r = 0;
         $transformations = &$this->transformations;
         for ($i = 0, $l = count($tokens); $i < $l; $i++) {
@@ -242,27 +234,28 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
                         $result = call_user_func_array($transformations[$tProperty], array($tokens[$i]));
                         if (!is_array($result) && is_object($result)) {
                             $result = array($result);
-                            }
-                        } else {
+                        }
+                    } else {
                         $tValue			= $tokens[$i]->Value;
                         $tMediaTypes	= $tokens[$i]->MediaTypes;
                         foreach ($transformations[$tProperty] as $property) {
                             if ($property !== null) {
                                 $result[] = new CssRulesetDeclarationToken($property, $tValue, $tMediaTypes);
-                                }
                             }
                         }
+                    }
                     if (count($result) > 0) {
                         array_splice($tokens, $i + 1, 0, $result);
                         $i += count($result);
                         $l += count($result);
-                        }
                     }
                 }
             }
+        }
 
         return $r;
-        }
+    }
+
     /**
      * Transforms the Internet Explorer specific declaration property "filter" to Internet Explorer 8+ compatible
      * declaratiopn property "-ms-filter".
@@ -271,14 +264,15 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
      * @return array
      */
     private static function filter($token)
-        {
+    {
         $r = array
             (
             new CssRulesetDeclarationToken("-ms-filter", "\"" . $token->Value . "\"", $token->MediaTypes),
             );
 
         return $r;
-        }
+    }
+
     /**
      * Transforms "opacity: {value}" into browser specific counterparts.
      *
@@ -286,7 +280,7 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
      * @return array
      */
     private static function opacity($token)
-        {
+    {
         // Calculate the value for Internet Explorer filter statement
         $ieValue = (int) ((float) $token->Value * 100);
         $r = array
@@ -299,7 +293,8 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
             );
 
         return $r;
-        }
+    }
+
     /**
      * Transforms "white-space: pre-wrap" into browser specific counterparts.
      *
@@ -307,7 +302,7 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
      * @return array
      */
     private static function whiteSpace($token)
-        {
+    {
         if (strtolower($token->Value) === "pre-wrap") {
             $r = array
                 (
@@ -324,8 +319,8 @@ class CssConvertLevel3PropertiesMinifierFilter extends aCssMinifierFilter
                 );
 
             return $r;
-            } else {
+        } else {
             return array();
-            }
         }
     }
+}

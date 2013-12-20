@@ -1,4 +1,7 @@
 <?php
+
+namespace Oneup\CssMin\Minifier\Plugin;
+
 /**
  * This {@link aCssMinifierPlugin} will convert named color values to hexadecimal notation.
  *
@@ -13,16 +16,9 @@
  * color:#000;
  * border:1px solid #4b0082;
  * </code>
- *
- * @package		CssMin/Minifier/Plugins
- * @link		http://code.google.com/p/cssmin/
- * @author		Joe Scylla <joe.scylla@gmail.com>
- * @copyright	2008 - 2011 Joe Scylla <joe.scylla@gmail.com>
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- * @version		3.0.1
  */
 class CssConvertNamedColorsMinifierPlugin extends aCssMinifierPlugin
-    {
+{
 
     /**
      * Regular expression matching the value.
@@ -41,8 +37,7 @@ class CssConvertNamedColorsMinifierPlugin extends aCssMinifierPlugin
      *
      * @var array
      */
-    private $transformation = array
-        (
+    private $transformation = array (
         "aliceblue"						=> "#f0f8ff",
         "antiquewhite"					=> "#faebd7",
         "aqua"							=> "#0ff",
@@ -179,7 +174,8 @@ class CssConvertNamedColorsMinifierPlugin extends aCssMinifierPlugin
         "whitesmoke"					=> "#f5f5f5",
         "yellow"						=> "#ff0",
         "yellowgreen"					=> "#9acd32"
-        );
+    );
+
     /**
      * Overwrites {@link aCssMinifierPlugin::__construct()}.
      *
@@ -191,10 +187,11 @@ class CssConvertNamedColorsMinifierPlugin extends aCssMinifierPlugin
      * @return void
      */
     public function __construct(CssMinifier $minifier, array $configuration = array())
-        {
+    {
         $this->reMatch = "/(^|\s)+(" . implode("|", array_keys($this->transformation)) . ")(\s|$)+/eiS";
         parent::__construct($minifier, $configuration);
-        }
+    }
+
     /**
      * Implements {@link aCssMinifierPlugin::minify()}.
      *
@@ -202,31 +199,31 @@ class CssConvertNamedColorsMinifierPlugin extends aCssMinifierPlugin
      * @return boolean   Return TRUE to break the processing of this token; FALSE to continue
      */
     public function apply(aCssToken &$token)
-        {
+    {
         $lcValue = strtolower($token->Value);
         // Declaration value equals a value in the transformation table => simple replace
         if (isset($this->transformation[$lcValue])) {
             $token->Value = $this->transformation[$lcValue];
-            }
+        }
         // Declaration value contains a value in the transformation table => regular expression replace
         elseif (preg_match($this->reMatch, $token->Value)) {
             $token->Value = preg_replace($this->reMatch, $this->reReplace, $token->Value);
-            }
+        }
 
         return false;
-        }
+    }
+
     /**
      * Implements {@link aMinifierPlugin::getTriggerTokens()}
      *
      * @return array
      */
     public function getTriggerTokens()
-        {
-        return array
-            (
+    {
+        return array (
             "CssAtFontFaceDeclarationToken",
             "CssAtPageDeclarationToken",
             "CssRulesetDeclarationToken"
-            );
-        }
+        );
     }
+}
