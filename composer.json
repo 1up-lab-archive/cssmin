@@ -1,6 +1,6 @@
 {
     "name": "oneup/cssmin",
-    "description": "CSS minifier from Joe Scylla made ready for present usages.",
+    "description": "CSS minifier from Joe Scylla made ready for the present days.",
     "keywords": ["css", "minifier"],
     "homepage": "http://1up.io",
     "type": "library",
