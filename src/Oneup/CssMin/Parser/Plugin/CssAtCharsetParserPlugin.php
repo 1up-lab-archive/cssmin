@@ -2,6 +2,8 @@
 
 namespace Oneup\CssMin\Parser\Plugin;
 
+use Oneup\CssMin\Parser\Token\CssAtCharsetToken;
+
 /**
  * {@link aCssParserPlugin Parser plugin} for parsing @charset at-rule.
  *

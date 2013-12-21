@@ -2,6 +2,8 @@
 
 namespace Oneup\CssMin\Parser\Plugin;
 
+use Oneup\CssMin\Parser\Token\CssCommentToken;
+
 /**
  * {@link aCssParserPlugin Parser plugin} for parsing comments.
  *
