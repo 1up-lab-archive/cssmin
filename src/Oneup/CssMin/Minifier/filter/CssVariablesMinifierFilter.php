@@ -16,9 +16,12 @@ class CssVariablesMinifierFilter extends aCssMinifierFilter
         $defaultMediaTypes	= array("all");
         $mediaTypes			= array();
         $remove				= array();
+
+        $tokenNamespace = "Oneup\CssMin\Parser\Token\\";
+
         for ($i = 0, $l = count($tokens); $i < $l; $i++) {
             // @variables at-rule block found
-            if (get_class($tokens[$i]) === "CssAtVariablesStartToken") {
+            if (get_class($tokens[$i]) === $tokenNamespace . "CssAtVariablesStartToken") {
                 $remove[] = $i;
                 $mediaTypes = (count($tokens[$i]->MediaTypes) == 0 ? $defaultMediaTypes : $tokens[$i]->MediaTypes);
                 foreach ($mediaTypes as $mediaType) {
@@ -29,14 +32,14 @@ class CssVariablesMinifierFilter extends aCssMinifierFilter
                 // Read the variable declaration tokens
                 for ($i = $i; $i < $l; $i++) {
                     // Found a variable declaration => read the variable values
-                    if (get_class($tokens[$i]) === "CssAtVariablesDeclarationToken") {
+                    if (get_class($tokens[$i]) === $tokenNamespace . "CssAtVariablesDeclarationToken") {
                         foreach ($mediaTypes as $mediaType) {
                             $variables[$mediaType][$tokens[$i]->Property] = $tokens[$i]->Value;
                         }
                         $remove[] = $i;
                     }
                     // Found the variables end token => break;
-                    elseif (get_class($tokens[$i]) === "CssAtVariablesEndToken") {
+                    elseif (get_class($tokens[$i]) === $tokenNamespace . "CssAtVariablesEndToken") {
                         $remove[] = $i;
                         break;
                     }
@@ -62,8 +65,9 @@ class CssVariablesMinifierFilter extends aCssMinifierFilter
             $tokens[$i] = null;
         }
 
-        if (!($plugin = $this->minifier->getPlugin("CssVariablesMinifierPlugin"))) {
-            CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The plugin <code>CssVariablesMinifierPlugin</code> was not found but is required for <code>" . __CLASS__ . "</code>"));
+        if (!($plugin = $this->minifier->getPlugin("Oneup\CssMin\Minifier\Plugin\CssVariablesMinifierPlugin"))) {
+            var_dump($plugin); die();
+            throw new \InvalidArgumentException(sprintf('The plugin CssVariablesMinifierPlugin was not found but is required for %s', __CLASS__));
         } else {
             $plugin->setVariables($variables);
         }

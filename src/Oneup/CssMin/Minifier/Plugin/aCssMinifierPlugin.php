@@ -2,6 +2,9 @@
 
 namespace Oneup\CssMin\Minifier\Plugin;
 
+use Oneup\CssMin\Minifier\CssMinifier;
+use Oneup\CssMin\Parser\Token\aCssToken;
+
 abstract class aCssMinifierPlugin
 {
     /**

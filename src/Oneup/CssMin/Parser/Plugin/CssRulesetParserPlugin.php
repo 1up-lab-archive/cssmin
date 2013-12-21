@@ -2,6 +2,10 @@
 
 namespace Oneup\CssMin\Parser\Plugin;
 
+use Oneup\CssMin\Parser\Token\CssRulesetStartToken;
+use Oneup\CssMin\Parser\Token\CssRulesetDeclarationToken;
+use Oneup\CssMin\Parser\Token\CssRulesetEndToken;
+
 /**
  * {@link aCssParserPlugin Parser plugin} for parsing ruleset block with including declarations.
  *
@@ -77,7 +81,7 @@ class CssRulesetParserPlugin extends aCssParserPlugin
             if ($this->buffer === "filter") {
                 return false;
             }
-            CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": Unterminated declaration", $this->buffer . ":" . $this->parser->getBuffer() . "_"));
+            throw new \InvalidArgumentException(sprintf('Unterminated declaration, %s: %s', $this->buffer, $this->parser->getBuffer()));
         }
         // End of declaration
         elseif (($char === ";" || $char === "}") && $state === "T_RULESET_DECLARATION") {

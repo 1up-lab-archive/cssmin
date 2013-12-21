@@ -2,6 +2,8 @@
 
 namespace Oneup\CssMin\Minifier\Plugin;
 
+use Oneup\CssMin\Parser\Token\aCssToken;
+
 /**
  * This {@link aCssMinifierPlugin} will process var-statement and sets the declaration value to the variable value.
  *

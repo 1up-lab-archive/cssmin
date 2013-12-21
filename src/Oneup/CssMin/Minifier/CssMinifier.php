@@ -2,6 +2,8 @@
 
 namespace Oneup\CssMin\Minifier;
 
+use Oneup\CssMin\Parser\CssParser;
+
 class CssMinifier
 {
     /**
@@ -62,24 +64,24 @@ class CssMinifier
         // Filters
         foreach ($filters as $name => $config) {
             if ($config !== false) {
-                $class	= "Css" . $name . "MinifierFilter";
+                $class	= "Oneup\CssMin\Minifier\Filter\Css" . $name . "MinifierFilter";
                 $config = is_array($config) ? $config : array();
                 if (class_exists($class)) {
                     $this->filters[] = new $class($this, $config);
                 } else {
-                    CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The filter <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"));
+                    throw new \InvalidArgumentException(sprintf("The filter %s with the class name %s was not found", $name, $class));
                 }
             }
         }
         // Plugins
         foreach ($plugins as $name => $config) {
             if ($config !== false) {
-                $class	= "Css" . $name . "MinifierPlugin";
+                $class	= "Oneup\CssMin\Minifier\Plugin\Css" . $name . "MinifierPlugin";
                 $config = is_array($config) ? $config : array();
                 if (class_exists($class)) {
                     $this->plugins[] = new $class($this, $config);
                 } else {
-                    CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"));
+                    throw new \InvalidArgumentException(sprintf("The plugin %s with the class name %s was not found", $name, $class));
                 }
             }
         }

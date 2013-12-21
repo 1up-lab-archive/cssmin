@@ -2,6 +2,8 @@
 
 namespace Oneup\CssMin;
 
+use Oneup\CssMin\Minifier\CssMinifier;
+
 class CssMin
 {
     /**

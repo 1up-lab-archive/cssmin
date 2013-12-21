@@ -2,6 +2,8 @@
 
 namespace Oneup\CssMin\Parser\Plugin;
 
+use Oneup\CssMin\Parser\CssParser;
+
 /**
  * Abstract definition of a parser plugin.
  *

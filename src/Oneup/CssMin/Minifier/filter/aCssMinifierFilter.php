@@ -2,6 +2,8 @@
 
 namespace Oneup\CssMin\Minifier\Filter;
 
+use Oneup\CssMin\Minifier\CssMinifier;
+
 abstract class aCssMinifierFilter
 {
     /**

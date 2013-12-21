@@ -2,6 +2,8 @@
 
 namespace Oneup\CssMin\Parser;
 
+use Oneup\CssMin\Parser\Token\aCssToken;
+
 class CssParser
 {
     /**
@@ -89,12 +91,12 @@ class CssParser
         // Create plugin instances
         foreach ($plugins as $name => $config) {
             if ($config !== false) {
-                $class	= "Css" . $name . "ParserPlugin";
+                $class	= "Oneup\CssMin\Parser\Plugin\Css" . $name . "ParserPlugin";
                 $config = is_array($config) ? $config : array();
                 if (class_exists($class)) {
                     $this->plugins[] = new $class($this, $config);
                 } else {
-                    CssMin::triggerError(new CssError(__FILE__, __LINE__, __METHOD__ . ": The plugin <code>" . $name . "</code> with the class name <code>" . $class . "</code> was not found"));
+                    throw new \InvalidArgumentException(sprintf('The plugin %s with the class %s was not found.', $name, $class));
                 }
             }
         }

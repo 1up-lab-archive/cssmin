@@ -1,6 +1,6 @@
 <?php
 
-namespace Oneup\CssMin;
+namespace Oneup\CssMin\Test;
 
 class TestSuiteLoaderTest extends \PHPUnit_Framework_TestCase
 {
